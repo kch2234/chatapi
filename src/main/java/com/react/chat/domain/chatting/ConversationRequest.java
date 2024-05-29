@@ -18,7 +18,7 @@ public class ConversationRequest extends BaseEntityUpdatedDate {
 
     @ManyToOne
     @JoinColumn(name = "senderId", nullable = false)
-    private Member senderId;
+    private Member sender;
 
     @ManyToOne
     @JoinColumn(name = "receiverId", nullable = false)

@@ -2,15 +2,18 @@ package com.react.chat.dto;
 
 import com.react.chat.domain.enumFiles.Gendar;
 import com.react.chat.domain.enumFiles.Role;
+import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+@Data
 public class MemberDTO {
     private Long id;
     private String email;
     private String nickname;
     private String password;
-    //private String profileImg;
+    private List<ProfileImageDTO> profileImageDTO;
     private int phone;
     private String introduction;
     private LocalDateTime birth;

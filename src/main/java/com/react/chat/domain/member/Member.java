@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -19,29 +21,20 @@ import java.time.LocalDateTime;
 public class Member extends BaseEntityUpdatedDate {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 회원 번호
-
-    @Column(nullable = false, updatable = false, unique = true)
     private String email; // 이메일
-
-    @Column(nullable = false, unique = true)
     private String nickname; // 닉네임
-
-    @Column(nullable = false)
     private String password; // 비밀번호
 
-    //private String profileImage; // 프로필 이미지
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProfileImage> imageList;
 
-    @Column(nullable = false, updatable = false, unique = true)
-    private int phone; // 전화번호
+    private String phone; // 전화번호
 
-    @Column(length = 1000)
     private String introduction = ""; // 자기 소개
 
-    @Column(nullable = false, updatable = false)
     private LocalDateTime birth; // 생년월일
 
     private boolean disabled = false; // 탈퇴 여부 기본값 false : 탈퇴시 true
-
     private LocalDateTime disabledDate; // 탈퇴 날짜 : 30일 후 DB 삭제
 
     @Enumerated(EnumType.STRING) // enum 문자열로 들어가도록
@@ -81,6 +74,4 @@ public class Member extends BaseEntityUpdatedDate {
     public void changeNationality(String nationality) {
         this.nationality = nationality;
     }
-
-
 }

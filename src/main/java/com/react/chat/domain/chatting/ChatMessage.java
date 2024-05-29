@@ -26,4 +26,5 @@ public class ChatMessage extends BaseEntityUpdatedDate {
 
     private String message;
 
+
 }

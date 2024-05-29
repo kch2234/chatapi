@@ -16,10 +16,8 @@ import java.util.List;
 public class ChatRoom extends BaseEntityCreatedDate {
     @Id @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
+    private String roomName;
 
     @OneToMany(mappedBy = "chatRoom")//cascade = CascadeType.REMOVE) => 삭제시 채팅방 삭제
     private List<ChatMessage> chatMessageList;
-
-    /*@Column(nullable = false)
-    private String roomName; // 채팅방 이름*/
 }

@@ -13,6 +13,10 @@
         hibernate:
           format_sql: true
           highlight_sql: true
+    servlet:  # 파일 업로드 설정
+      multipart:
+        max-request-size: 30MB
+        max-file-size: 10MB
 
   logging:
     level:
@@ -23,3 +27,6 @@
     servlet:
       session:
         tracking-modes: cookie
+
+# 파일 업로드 경로
+chat.upload.path: upload

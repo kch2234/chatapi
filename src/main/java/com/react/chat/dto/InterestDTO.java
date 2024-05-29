@@ -15,5 +15,4 @@ public class InterestDTO {
     private Long id;
     private Member member;
     private Interests interest;
-
 }

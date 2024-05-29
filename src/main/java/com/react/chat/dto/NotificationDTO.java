@@ -1,18 +1,20 @@
 package com.react.chat.dto;
 
-import com.react.chat.domain.enumFiles.UserLanguages;
 import com.react.chat.domain.member.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.cglib.core.internal.LoadingCache;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserLanguageDTO {
+public class NotificationDTO {
     private Long id;
-    private Member memberId;
-    private UserLanguages language;
+    private String type;
+    private Long refernceId;
+    private boolean readFlag;
+    private Member member;
 }

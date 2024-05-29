@@ -16,6 +16,4 @@ public class FollowDTO {
     private Long id;
     private Member follower;
     private Member follow;
-    private LocalDateTime createDate;
-
 }
