@@ -1,10 +1,11 @@
 package com.react.chat.domain.chatting;
 
 
-import com.react.chat.domain.baseEntity.BaseEntityCreatedDate;
+import com.react.chat.domain.baseEntity.BaseEntityUpdatedDate;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -13,11 +14,10 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChatRoom extends BaseEntityCreatedDate {
+public class ChatRoom extends BaseEntityUpdatedDate {
     @Id @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
-    private String roomName;
 
-    @OneToMany(mappedBy = "chatRoom")//cascade = CascadeType.REMOVE) => 삭제시 채팅방 삭제
-    private List<ChatMessage> chatMessageList;
+    @OneToMany(mappedBy = "chatRoom")//cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatMessage> chatMessageList = new ArrayList<>();
 }
