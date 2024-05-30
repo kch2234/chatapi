@@ -23,4 +23,8 @@ public class Follow extends BaseEntityCreatedDate {
     @JoinColumn(name = "followId")
     private Member follow; // 내가 팔로우 하는 대상 ID
 
+    public Follow(Member follower, Member follow) {
+        this.follower = follower; // 나를 팔로우 하는 유저
+        this.follow = follow; // 내가 팔로우 하는 대상
+    }
 }

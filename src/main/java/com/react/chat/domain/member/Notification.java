@@ -19,8 +19,10 @@ public class Notification extends BaseEntityCreatedDate {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    private String type; // 알림 타입 follow, ConversationRequest : 팔로우, 대화 요청
+    // TODO : 알림 타입 추가시 사용
+    //private String type; // 알림 타입 follow, ConversationRequest : 팔로우, 대화 요청
     private Long refernceId; // 참조 ID
+    @Builder.Default
     private boolean readFlag = false; // 읽음 여부 (기본값: false)
 
 }
