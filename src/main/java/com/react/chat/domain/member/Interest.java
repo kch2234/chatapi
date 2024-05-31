@@ -12,13 +12,14 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Interest extends BaseEntityCreatedDate {
-    @Id @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
+    @Column(nullable = false)
     private Interests interest;
 
 }

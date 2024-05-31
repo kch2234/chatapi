@@ -9,10 +9,11 @@ import java.util.List;
 @Builder
 public class ChatRoomDTO {
     private Long id;
-    private List<ChatMessageDTO> messageDTOS;
+    private String roomName;
+    // TODO : 테스트 후 String -> Member로 변경
+    private String member;
+    private String toMember;
 
-    public ChatRoomDTO(Long id, List<ChatMessageDTO> messageDTOS) {
-        this.id = id;
-        this.messageDTOS = messageDTOS;
-    }
+    private List<ChatMessageDTO> chatMessageList;
+
 }

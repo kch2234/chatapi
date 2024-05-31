@@ -1,5 +1,6 @@
 package com.react.chat.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 
@@ -9,18 +10,18 @@ import java.time.LocalDateTime;
 @Builder
 public class ChatMessageDTO {
     private Long id;
-    private Long chatRoomId;
+    private Long chatRoom;
+    // TODO: senderId를 member로 변경
     private Long senderId;
     private String message;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime timestamp;
 
-    public ChatMessageDTO(Long id, Long chatRoomId, Long senderId, String message, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    /*public ChatMessageDTO(Long id, Long chatRoomId, Long senderId, String message, LocalDateTime timestamp) {
         this.id = id;
         this.chatRoomId = chatRoomId;
         this.senderId = senderId;
         this.message = message;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
+        this.timestamp = timestamp;
+    }*/
 }

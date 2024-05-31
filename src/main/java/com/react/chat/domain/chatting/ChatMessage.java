@@ -5,6 +5,8 @@ import com.react.chat.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @ToString
@@ -13,18 +15,20 @@ import lombok.*;
 @NoArgsConstructor
 public class ChatMessage extends BaseEntityUpdatedDate {
     @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatRoomId", nullable = false)
     private ChatRoom chatRoom;
 
     @ManyToOne
     @JoinColumn(name = "senderId", nullable = false)
-    private Member senderId;
+    private Member member;
 
     private String message;
 
+    // 메시지 전송 시간
+    private LocalDateTime timestamp;
 
 }
