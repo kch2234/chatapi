@@ -1,5 +1,5 @@
 package com.react.chat.domain.enumFiles;
 
-public enum Gendar {
+public enum Gender {
     MALE,FEMALE,ALL
 }

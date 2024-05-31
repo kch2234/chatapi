@@ -8,5 +8,15 @@ public class ProfileImageDTO {
     private Long id;
     private String fileName;
     private int ord;
-    private Member memberProfile;
+    private Member member;
+
+    // 생성자 Entity -> DTO
+    public ProfileImageDTO(Long id, String fileName, int ord, Member member) {
+        this.id = id;
+        this.fileName = fileName;
+        this.ord = ord;
+        this.member = member;
+    }
+
+
 }

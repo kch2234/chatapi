@@ -35,5 +35,6 @@ public class ChatRoom extends BaseEntityUpdatedDate {
     private Member toMember;
 
     @OneToMany(mappedBy = "chatRoom")//cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<ChatMessage> chatMessageList = new ArrayList<>();
 }
