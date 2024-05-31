@@ -8,5 +8,5 @@ public class ProfileImageDTO {
     private Long id;
     private String fileName;
     private int ord;
-    private Member memberProfile;
+    private Member member;
 }

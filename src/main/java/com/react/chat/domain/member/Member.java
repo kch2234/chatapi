@@ -1,7 +1,7 @@
 package com.react.chat.domain.member;
 
 import com.react.chat.domain.baseEntity.BaseEntityUpdatedDate;
-import com.react.chat.domain.enumFiles.Gendar;
+import com.react.chat.domain.enumFiles.Gender;
 import com.react.chat.domain.enumFiles.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -28,7 +28,7 @@ public class Member extends BaseEntityUpdatedDate {
     private String password; // 비밀번호
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProfileImage> imageList; //프로필 이미지
+    private List<ProfileImage> profileImage; //프로필 이미지
 
     private String phone; // 전화번호
 
@@ -43,7 +43,7 @@ public class Member extends BaseEntityUpdatedDate {
 
     @Enumerated(EnumType.STRING) // enum 문자열로 들어가도록
     @Column(nullable = false, updatable = false)
-    private Gendar gendar; // 성별
+    private Gender gender; // 성별
 
     @Enumerated(EnumType.STRING) // enum 문자열로 들어가도록
     @Column(nullable = false, updatable = false)

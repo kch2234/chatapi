@@ -16,12 +16,4 @@ public class ChatMessageDTO {
     private String message;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
-
-    /*public ChatMessageDTO(Long id, Long chatRoomId, Long senderId, String message, LocalDateTime timestamp) {
-        this.id = id;
-        this.chatRoomId = chatRoomId;
-        this.senderId = senderId;
-        this.message = message;
-        this.timestamp = timestamp;
-    }*/
 }

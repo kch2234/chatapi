@@ -14,7 +14,6 @@ import java.util.Set;
 
 @Entity
 @Getter
-@ToString
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -35,5 +34,24 @@ public class ChatRoom extends BaseEntityUpdatedDate {
     private Member toMember;
 
     @OneToMany(mappedBy = "chatRoom")//cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<ChatMessage> chatMessageList = new ArrayList<>();
+
+/*    public void setMember(Long id) {
+        this.member = Member.builder().id(id).build();
+    }*/
+
+/*    public ChatRoomDTO toDTO() {
+        return ChatRoomDTO.builder()
+                .id(id)
+                .roomName(roomName)
+                .member(member)
+                .toMember(toMember)
+                .chatMessageList(chatMessageList)
+                .build();
+    }*/
+
+    public void changeRoomName(String roomName) {
+        this.roomName = roomName;
+    }
 }

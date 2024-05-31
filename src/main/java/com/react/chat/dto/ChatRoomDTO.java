@@ -1,5 +1,7 @@
 package com.react.chat.dto;
 
+import com.react.chat.domain.chatting.ChatMessage;
+import com.react.chat.domain.member.Member;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,9 +13,7 @@ public class ChatRoomDTO {
     private Long id;
     private String roomName;
     // TODO : 테스트 후 String -> Member로 변경
-    private String member;
-    private String toMember;
-
-    private List<ChatMessageDTO> chatMessageList;
-
+    private Member member;
+    private Member toMember;
+    private List<ChatMessage> chatMessageList;
 }
