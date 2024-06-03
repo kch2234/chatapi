@@ -17,7 +17,7 @@ import java.util.Arrays;
 @Slf4j
 public class CustomSecurityConfig {
 
-  @Bean
+  /*@Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     log.info("***** security config!");
 
@@ -36,7 +36,7 @@ public class CustomSecurityConfig {
     });
 
     return http.build();
-  }
+  }*/
 
   // CORS 설정 정보
   @Bean

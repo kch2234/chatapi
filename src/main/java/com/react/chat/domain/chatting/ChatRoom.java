@@ -19,39 +19,19 @@ import java.util.Set;
 @NoArgsConstructor
 public class ChatRoom extends BaseEntityUpdatedDate {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String roomName;
+    private Long roomId;
 
-/*    @ManyToMany
-    private Set<Member> chatMembers = new HashSet<>();*/
-
-
+    @Setter
     @ManyToOne
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    @JoinColumn(name = "sender_id")
+    private Member sender;
+    @Setter
     @ManyToOne
-    @JoinColumn(name = "tmember_id", nullable = false)
-    private Member toMember;
+    @JoinColumn(name = "receiver_id")
+    private Member receiver;
 
-    @OneToMany(mappedBy = "chatRoom")//cascade = CascadeType.ALL, orphanRemoval = true)
+    /*@OneToMany(mappedBy = "chatRoom")//cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<ChatMessage> chatMessageList = new ArrayList<>();
+    private List<ChatMessage> chatMessageList = new ArrayList<>();*/
 
-/*    public void setMember(Long id) {
-        this.member = Member.builder().id(id).build();
-    }*/
-
-/*    public ChatRoomDTO toDTO() {
-        return ChatRoomDTO.builder()
-                .id(id)
-                .roomName(roomName)
-                .member(member)
-                .toMember(toMember)
-                .chatMessageList(chatMessageList)
-                .build();
-    }*/
-
-    public void changeRoomName(String roomName) {
-        this.roomName = roomName;
-    }
 }

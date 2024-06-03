@@ -25,23 +25,18 @@ class ChatRoomRepositoryTest {
     // 채팅방 생성
     @Test
     public void testInsert() {
-        for (int i = 1; i <= 4; i++) {
-            for (int j = 1; j <= 4; j++) {
-                if (i != j) {
-                    ChatRoom chatRoom = ChatRoom.builder()
-                            .member(Member.builder().id((long) i).build())
-                            .toMember(Member.builder().id((long) j).build())
-                            .build();
-                    chatRoomRepository.save(chatRoom);
-                }
-            }
-        }
+        for (int i = 1; i <= 10; i++) {
+            ChatRoom chatRoom = ChatRoom.builder()
+                    .roomName("room" + i)
+                    .build();
+            chatRoomRepository.save(chatRoom); // 저장
+        }// for
     }
 
     // 회원 id로 채팅방 목록 조회
     @Test
     public void listTest() {
-        List<ChatRoom> chatRooms = chatRoomRepository.findAllByMemberId(1L);
+        List<ChatRoom> chatRooms = chatRoomRepository.findAll();
         log.info("chatRooms : {}", chatRooms);
     }
 }

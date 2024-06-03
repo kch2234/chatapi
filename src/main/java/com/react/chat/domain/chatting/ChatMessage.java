@@ -15,19 +15,22 @@ import java.time.LocalDateTime;
 public class ChatMessage extends BaseEntityUpdatedDate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long messageId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chatRoomId", nullable = false)
-    private ChatRoom chatRoom;
+    @Column(nullable = false)
+    private String content;
 
+    @Column(nullable = false)
+    private LocalDateTime sendTime;
+
+    @Setter
     @ManyToOne
-    @JoinColumn(name = "senderId", nullable = false)
-    private Member member;
+    @JoinColumn(name = "sender_id", nullable = false)
+    private Member sender;
 
-    private String message;
-
-    // 메시지 전송 시간
-    private LocalDateTime timestamp;
+    @Setter
+    @ManyToOne
+    @JoinColumn(name = "room_id", nullable = false)
+    private ChatRoom chatRoom;
 
 }

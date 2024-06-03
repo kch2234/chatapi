@@ -47,7 +47,7 @@ class MemberRepositoryTest {
     @Test
     public void testRead() {
         String email = "user9@test.com";
-        Member findMember = memberRepository.findByEmail(email);
+        Member findMember = memberRepository.getMemberByEmail(email);
         log.info("********** member : {}", findMember);
     }
 }

@@ -16,8 +16,5 @@ import java.util.List;
 public class ChatRoomDTO {
     private Long id;
     private String roomName;
-    // TODO : 테스트 후 String -> Member로 변경
-    private Member member;
-    private Member toMember;
     private List<ChatMessage> chatMessageList;
 }
