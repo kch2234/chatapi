@@ -1,13 +1,18 @@
 package com.react.chat.config;
 
+import com.react.chat.security.filter.JWTCheckFilter;
+import com.react.chat.security.handler.CustomLoginFailureHandler;
+import com.react.chat.security.handler.CustomLoginSuccessHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -15,6 +20,7 @@ import java.util.Arrays;
 
 @Configuration
 @Slf4j
+@EnableMethodSecurity
 public class CustomSecurityConfig {
 
   @Bean
@@ -32,8 +38,14 @@ public class CustomSecurityConfig {
     http.csrf(csrf -> csrf.disable());
 
     http.formLogin(login -> {
-      login.loginPage("/api/member/login");
+      login.loginPage("/api/member/login"); // 로그인 경로
+      // 로그인 성공시 실행될 로직 클래스
+      login.successHandler(new CustomLoginSuccessHandler());
+      // 로그인 실패시 실행될 로직 클래스
+      login.failureHandler(new CustomLoginFailureHandler());
     });
+
+    http.addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
