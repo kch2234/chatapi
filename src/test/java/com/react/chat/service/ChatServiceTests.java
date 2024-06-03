@@ -22,19 +22,21 @@ class ChatServiceTests {
     public void testAdd() {
         ChatRoomDTO chatRoomDTO = ChatRoomDTO.builder()
                 .roomName("테스트 채팅방")
-                .member(Member.builder().id(2L).build())
+                .member(Member.builder().id(5L).build())
                 .toMember(Member.builder().id(1L).build())
                 .chatMessageList(List.of(ChatMessage.builder().message("테스트 메시지").build()))
                 .build();
         log.info("chatRoomDTO : {}", chatRoomDTO);
-        Long savedId = chatService.add(chatRoomDTO);
-        log.info("savedId : {}", savedId);
+        // 채팅방 생성
+//        Long savedId = chatService.add(chatRoomDTO);
+//        log.info("savedId : {}", savedId);
     }
 
-    // 채팅방 이름으로 조회 테스트
+    // 채팅방 조회 테스트
     @Test
-    public void testFindByName() {
-
+    public void getTest() {
+        ChatRoomDTO chatRoomDTO = chatService.get(13L);
+        log.info("find dto : {}", chatRoomDTO);
     }
 
     // 채팅방 수정 테스트
@@ -42,6 +44,11 @@ class ChatServiceTests {
     // 채팅방 삭제 테스트
 
     // 채팅방 목록조회 테스트
+    @Test
+    public void listTest() {
+        List<ChatRoomDTO> list = chatService.getListASC();
+        log.info("list : {}", list);
+    }
 
     // 채팅방 메시지 전송 테스트
 

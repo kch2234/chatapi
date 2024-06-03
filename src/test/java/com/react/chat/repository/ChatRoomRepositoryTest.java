@@ -41,8 +41,7 @@ class ChatRoomRepositoryTest {
     // 회원 id로 채팅방 목록 조회
     @Test
     public void listTest() {
-        Long memberId = 1L;
-        List<ChatRoom> chatRooms = chatRoomRepository.findAllByMemberId(memberId);
+        List<ChatRoom> chatRooms = chatRoomRepository.findAllByMemberId(1L);
         log.info("chatRooms : {}", chatRooms);
     }
 }

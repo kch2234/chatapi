@@ -1,13 +1,18 @@
 package com.react.chat.service;
 
+import com.react.chat.domain.chatting.ChatMessage;
 import com.react.chat.domain.chatting.ChatRoom;
+import com.react.chat.domain.member.Member;
+import com.react.chat.dto.ChatMessageDTO;
 import com.react.chat.dto.ChatRoomDTO;
+import com.react.chat.repository.ChatMessageRepository;
 import com.react.chat.repository.ChatRoomRepository;
 import com.react.chat.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,10 +20,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Slf4j
 public class ChatService {
+    private final MemberRepository memberRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatMessageRepository chatMessageRepository;
     private final ModelMapper modelMapper;
 
     // 채팅방 생성
@@ -30,10 +38,9 @@ public class ChatService {
     }
 
     // 채팅방 조회
-    @Transactional
     public ChatRoomDTO get(Long id) {
-        ChatRoom chatRoom = chatRoomRepository.findById(id).orElseThrow();
-        ChatRoomDTO dto = modelMapper.map(chatRoom, ChatRoomDTO.class);
+        ChatRoom findChatRoom = chatRoomRepository.findById(id).orElseThrow();
+        ChatRoomDTO dto = modelMapper.map(findChatRoom, ChatRoomDTO.class);
         return dto;
     }
 
@@ -47,28 +54,30 @@ public class ChatService {
     // 채팅방 삭제
     @Transactional
     public void remove(Long id) {
-        ChatRoom findChatRoom = chatRoomRepository.findById(id).orElseThrow();
+        ChatRoom findChatRoom = chatRoomRepository.findById(id).orElse(null);
         if (findChatRoom != null) {
             chatRoomRepository.delete(findChatRoom);
-        }else {
-            log.info("해당 채팅방이 존재하지 않습니다.");
-            log.info("삭제 실패.....");
+        } else {
+            throw new IllegalArgumentException("해당 채팅방이 존재하지 않습니다.");
         }
     }
 
     // 채팅방 목록조회 - 작성순, List - ASC
     public List<ChatRoomDTO> getListASC() {
-        List<ChatRoom> list = chatRoomRepository.findAll(Sort.by(Sort.Direction.ASC, "createdDate"));
-        return list.stream().map(chatRoom -> modelMapper
-                .map(chatRoom, ChatRoomDTO.class))
+        List<ChatRoomDTO> list = chatRoomRepository.findAll(Sort.by(Sort.Direction.ASC, "id"))
+                .stream().map(chatRoom -> modelMapper.map(chatRoom, ChatRoomDTO.class))
                 .collect(Collectors.toList());
+        return list;
     }
 
     // 채팅방 목록조회 - 최신순, List - DESC
-
+    public List<ChatRoomDTO> getListDESC() {
+        List<ChatRoomDTO> list = chatRoomRepository.findAll(Sort.by(Sort.Direction.DESC, "id"))
+                .stream().map(chatRoom -> modelMapper.map(chatRoom, ChatRoomDTO.class))
+                .collect(Collectors.toList());
+        return list;
+    }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // ChatRoomName 검색목록조회 - 작성순, List - ASC
 
-    // ChatRoomName 검색목록조회 - 최신순, List - DESC
-
+    // 채팅방 메시지 전송
 }

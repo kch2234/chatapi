@@ -41,6 +41,9 @@ dependencies {
 	// 썸네일
 //	implementation 'net.coobird:thumbnailator:0.4.19'
 
+	// 웹소켓
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.mysql:mysql-connector-j'

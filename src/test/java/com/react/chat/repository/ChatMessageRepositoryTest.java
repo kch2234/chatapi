@@ -48,8 +48,7 @@ class ChatMessageRepositoryTest {
     // 채팅방 id로 메시지 목록 조회
     @Test
     public void testSelect() {
-        Long chatRoomId = 1L;
-        List<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomId(chatRoomId);
+        List<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomId(1L);
         log.info("chatMessages : {}", chatMessages);
     }
 }

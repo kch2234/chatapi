@@ -8,9 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
-    /* ChatRoom 조회 - 회원별 채팅방 목록 조회 */
-    List<ChatRoom> findAllByMember(Member member);
-
     /* ChatRoom 조회 - RoomName 검색, 정확히 일치 */
     ChatRoom findByRoomName(String roomName);
 
