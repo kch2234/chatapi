@@ -3,14 +3,21 @@ package com.react.chat.domain.member;
 import com.react.chat.domain.baseEntity.BaseEntityUpdatedDate;
 import com.react.chat.domain.enumFiles.Gender;
 import com.react.chat.domain.enumFiles.Role;
+import com.react.chat.dto.MemberDTO;
+import com.react.chat.dto.ProfileImageDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -27,8 +34,6 @@ public class Member extends BaseEntityUpdatedDate {
     @Column(nullable = false, length = 500)
     private String password; // 비밀번호
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProfileImage> profileImage; //프로필 이미지
 
     private String phone; // 전화번호
 
@@ -62,7 +67,8 @@ public class Member extends BaseEntityUpdatedDate {
             joinColumns = @JoinColumn(name = "member_id"),
             inverseJoinColumns = @JoinColumn(name = "chatroom_id")
     )
-    private Set<ChatRoom> chatRooms = new HashSet<>();*/
+    private Set<ChatRoom> chatRooms = new HashSet<>();
+*/
 
     // 필드 수정 메서드
     // 닉네임 수정
@@ -89,4 +95,5 @@ public class Member extends BaseEntityUpdatedDate {
     public void changeNationality(String nationality) {
         this.nationality = nationality;
     }
+
 }
