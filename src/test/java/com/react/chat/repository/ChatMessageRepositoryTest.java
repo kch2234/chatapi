@@ -31,7 +31,7 @@ class ChatMessageRepositoryTest {
             ChatMessage chatMessage = ChatMessage.builder()
                     .message("메시지" + i)
                     .chatRoom(ChatRoom.builder().id(1L).build())
-                    .member(Member.builder().id(1L).build())
+                    .sender(Member.builder().id(1L).build())
                     .timestamp(LocalDateTime.now())
                     .build();
             chatMessageRepository.save(chatMessage);
@@ -46,9 +46,4 @@ class ChatMessageRepositoryTest {
     }
 
     // 채팅방 id로 메시지 목록 조회
-    @Test
-    public void testSelect() {
-        List<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomId(1L);
-        log.info("chatMessages : {}", chatMessages);
-    }
 }

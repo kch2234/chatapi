@@ -1,6 +1,7 @@
 package com.react.chat.domain.member;
 
 import com.react.chat.domain.baseEntity.BaseEntityUpdatedDate;
+import com.react.chat.domain.chatting.ChatRoom;
 import com.react.chat.domain.enumFiles.Gender;
 import com.react.chat.domain.enumFiles.Role;
 import com.react.chat.dto.MemberDTO;
@@ -63,14 +64,9 @@ public class Member extends BaseEntityUpdatedDate {
     private boolean disabled = false; // 탈퇴 여부 기본값 false : 탈퇴시 true
     private LocalDateTime disabledDate; // 탈퇴 날짜 : 30일 후 DB 삭제
 
-/*    @ManyToMany
-    @JoinTable(
-            name = "chatroom_members",
-            joinColumns = @JoinColumn(name = "member_id"),
-            inverseJoinColumns = @JoinColumn(name = "chatroom_id")
-    )
-    private Set<ChatRoom> chatRooms = new HashSet<>();
-*/
+    @ManyToMany(mappedBy = "members")
+    @Builder.Default
+    private List<ChatRoom> chatRooms = new ArrayList<>();
 
     // 필드 수정 메서드
     // 닉네임 수정

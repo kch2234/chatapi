@@ -1,37 +1,32 @@
 package com.react.chat.domain.chatting;
 
-
-import com.react.chat.domain.baseEntity.BaseEntityUpdatedDate;
+import com.react.chat.domain.baseEntity.BaseEntityCreatedDate;
 import com.react.chat.domain.member.Member;
-import com.react.chat.dto.ChatRoomDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
-@Getter
+@Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class ChatRoom extends BaseEntityUpdatedDate {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long roomId;
+@AllArgsConstructor
+public class ChatRoom extends BaseEntityCreatedDate {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Setter
-    @ManyToOne
-    @JoinColumn(name = "sender_id")
-    private Member sender;
-    @Setter
-    @ManyToOne
-    @JoinColumn(name = "receiver_id")
-    private Member receiver;
+    private String name;
 
-    /*@OneToMany(mappedBy = "chatRoom")//cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToMany
+    @JoinTable(
+            name = "chatroom_members",
+            joinColumns = @JoinColumn(name = "chatroom_id"),
+            inverseJoinColumns = @JoinColumn(name = "member_id")
+    )
     @Builder.Default
-    private List<ChatMessage> chatMessageList = new ArrayList<>();*/
-
+    private Set<Member> members = new HashSet<>();
 }
+

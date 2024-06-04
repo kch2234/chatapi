@@ -27,7 +27,7 @@ class ChatRoomRepositoryTest {
     public void testInsert() {
         for (int i = 1; i <= 10; i++) {
             ChatRoom chatRoom = ChatRoom.builder()
-                    .roomName("room" + i)
+                    .name("room" + i)
                     .build();
             chatRoomRepository.save(chatRoom); // 저장
         }// for
