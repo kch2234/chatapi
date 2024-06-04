@@ -1,7 +1,10 @@
 package com.react.chat.security.filter;
 
 import com.google.gson.Gson;
+import com.react.chat.domain.enumFiles.Gender;
+import com.react.chat.domain.enumFiles.Role;
 import com.react.chat.dto.MemberDTO;
+import com.react.chat.dto.ProfileImageDTO;
 import com.react.chat.util.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -13,12 +16,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 @Slf4j
 public class JWTCheckFilter extends OncePerRequestFilter {
-  // 필터 생략할것 지정하는 메서드 추가 (OncePer... 에 있는 메서드 오버라이딩)
+  // 생략 필터 메서드 추가
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
 
@@ -28,8 +32,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     }
 
     String requestURI = request.getRequestURI();
-    log.info("***** JWTCheckFilter - shouldNotFilter : requestURI : {}",
-        requestURI);
+    log.info("***** JWTCheckFilter - shouldNotFilter : requestURI : {}", requestURI);
     // 필터 체크 안 하는 경로
     if(requestURI.startsWith("/api/member/")) {
       return true;
@@ -48,24 +51,36 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
     String authValue = request.getHeader("Authorization");
     log.info("***** doFilterInternal - authValue : {}", authValue);
+
     try {
       String accessToken = authValue.substring(7);
       Map<String, Object> claims = JWTUtil.validateToken(accessToken);
       log.info("********* doFilterInternal - claims : {}", claims);
-      // * 인증 정보 claims로 MemberDTO 구성 -> 시큐리티에 반영 추가 (시큐리티용 권한)
+
+      // 인증 정보 claims로 MemberDTO 구성 -> 시큐리티에 반영 추가 (시큐리티용 권한)
+      Long id = (Long) claims.get("id");
       String email = (String) claims.get("email");
-      String password = (String) claims.get("password");
       String nickname = (String) claims.get("nickname");
-      Boolean social = (Boolean) claims.get("social");
-      List<String> roleNames = (List<String>) claims.get("roleNames");
+      String password = (String) claims.get("password");
+      List<ProfileImageDTO> profileImageDTO = (List<ProfileImageDTO>) claims.get("profileImageDTO");
+      String phone = (String) claims.get("phone");
+      String introduction = (String) claims.get("introduction");
+      LocalDateTime birth = (LocalDateTime) claims.get("birth");
+      String nationality = (String) claims.get("nationality");
+      Gender gender = (Gender) claims.get("gender");
+      Role role = (Role) claims.get("role");
+      Boolean disabled = (Boolean) claims.get("disabled");
+      LocalDateTime disabledDate = (LocalDateTime) claims.get("disabledDate");
+      LocalDateTime createDate = (LocalDateTime) claims.get("createDate");
+      LocalDateTime updateDate = (LocalDateTime) claims.get("updateDate");
 
-      MemberDTO memberDTO = new MemberDTO(email, password, nickname, social, roleNames);
-      log.info("***** doFileterInternal - memberDTO : {}", memberDTO);
+      MemberDTO memberDTO = new MemberDTO(id, email, nickname, password, profileImageDTO, phone, introduction, birth, disabled, disabledDate, nationality, gender, role, createDate, updateDate);
 
-      // * 시큐리티 인증 추가 : JWT와 SpringSecurity 로그인상태 호환되도록 처리
+      // 시큐리티 인증 추가 JWT <-> SpringSecurity 로그인 상태 호환
       UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO, password, memberDTO.getAuthorities());
       SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-      filterChain.doFilter(request, response); // 다음필터 이동해라~
+      filterChain.doFilter(request, response);
+
     }catch (Exception e) {
       log.error("***** JWTCheckFilter error!!!");
       log.error(e.getMessage());

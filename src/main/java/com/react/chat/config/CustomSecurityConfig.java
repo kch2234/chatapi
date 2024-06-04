@@ -1,6 +1,7 @@
 package com.react.chat.config;
 
 import com.react.chat.security.filter.JWTCheckFilter;
+import com.react.chat.security.handler.CustomAccessDeniedHandler;
 import com.react.chat.security.handler.CustomLoginFailureHandler;
 import com.react.chat.security.handler.CustomLoginSuccessHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +47,11 @@ public class CustomSecurityConfig {
     });
 
     http.addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class);
+
+    // 접근 제한(허용X) 되었을 경우 예외 처리
+    http.exceptionHandling(exception -> {
+      exception.accessDeniedHandler(new CustomAccessDeniedHandler());
+    });
 
     return http.build();
   }

@@ -61,7 +61,6 @@ public class MemberDTO extends User {
     Map<String, Object> map = new HashMap<>();
     map.put("id", id);
     map.put("email", email);
-    map.put("password", password); // 비번은 나중에 전달 안하는 것으로 변경. 지금은 확인차 추가
     map.put("profileImageDTO", profileImageDTO); // List<ProfileImageDTO> 타입
     map.put("phone", phone);
     map.put("nickname", nickname);
