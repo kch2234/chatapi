@@ -1,6 +1,7 @@
 package com.react.chat.security;
 
 import com.react.chat.domain.member.Member;
+import com.react.chat.domain.member.ProfileImage;
 import com.react.chat.dto.MemberDTO;
 import com.react.chat.dto.ProfileImageDTO;
 import com.react.chat.repository.MemberRepository;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +36,9 @@ public class CustomUserDetailsService implements UserDetailsService {
       throw new UsernameNotFoundException("Email(username) Not Found");
     }
 
-    MemberDTO memberDTO = new MemberDTO(member.getId(), member.getEmail(), member.getNickname(), member.getPassword(),
+    List<ProfileImageDTO> profileImageDTOList = new ArrayList<>();  // 프로필 이미지 리스트
+
+    MemberDTO memberDTO = new MemberDTO(member.getId(), member.getEmail(), member.getNickname(), member.getPassword(), profileImageDTOList,
         member.getPhone(), member.getIntroduction(), member.getBirth(),
         member.isDisabled(), member.getDisabledDate(),
         member.getNationality(), member.getGender(), member.getRole(),

@@ -34,6 +34,8 @@ public class Member extends BaseEntityUpdatedDate {
     @Column(nullable = false, length = 500)
     private String password; // 비밀번호
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProfileImage> profileImage; //프로필 이미지
 
     private String phone; // 전화번호
 
