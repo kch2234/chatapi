@@ -10,6 +10,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,6 +24,7 @@ import java.util.Map;
 
 @Slf4j
 public class JWTCheckFilter extends OncePerRequestFilter {
+
   // 생략 필터 메서드 추가
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
@@ -54,14 +56,6 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     log.info("***** doFilterInternal - authValue : {}", authValue);
 
     try {
-      /*
-      // 토큰 없는 경우 다음 필터로 넘어가기
-      if (authValue == null || !authValue.startsWith("Bearer ")) {
-        filterChain.doFilter(request, response);
-        return;
-      }
-      */
-
       String accessToken = authValue.substring(7);
       Map<String, Object> claims = JWTUtil.validateToken(accessToken);
       log.info("********* doFilterInternal - claims : {}", claims);

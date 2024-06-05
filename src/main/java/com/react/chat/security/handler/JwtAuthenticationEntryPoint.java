@@ -1,4 +1,4 @@
-package com.react.chat.security.filter;
+package com.react.chat.security.handler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

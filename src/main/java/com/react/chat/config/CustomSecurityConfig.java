@@ -4,11 +4,13 @@ import com.react.chat.security.filter.JWTCheckFilter;
 import com.react.chat.security.handler.CustomAccessDeniedHandler;
 import com.react.chat.security.handler.CustomLoginFailureHandler;
 import com.react.chat.security.handler.CustomLoginSuccessHandler;
+import com.react.chat.security.handler.JwtAuthenticationEntryPoint;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,10 +19,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import java.util.Arrays;
 
 @Configuration
 @Slf4j
+@EnableWebSecurity
 @EnableMethodSecurity
 public class CustomSecurityConfig {
 
@@ -51,6 +55,7 @@ public class CustomSecurityConfig {
     // 접근 제한(허용X) 되었을 경우 예외 처리
     http.exceptionHandling(exception -> {
       exception.accessDeniedHandler(new CustomAccessDeniedHandler());
+      exception.authenticationEntryPoint(new JwtAuthenticationEntryPoint());
     });
 
     return http.build();

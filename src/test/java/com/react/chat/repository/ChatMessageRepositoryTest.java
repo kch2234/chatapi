@@ -29,7 +29,7 @@ class ChatMessageRepositoryTest {
     public void testInsert() {
         for (int i = 1; i <= 10; i++) {
             ChatMessage chatMessage = ChatMessage.builder()
-                    .message("메시지" + i)
+                    .content("메시지" + i)
                     .chatRoom(ChatRoom.builder().id(1L).build())
                     .sender(Member.builder().id(1L).build())
                     .timestamp(LocalDateTime.now())

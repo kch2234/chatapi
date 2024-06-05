@@ -41,9 +41,10 @@ dependencies {
 	// 썸네일
 //	implementation 'net.coobird:thumbnailator:0.4.19'
 
-	// 웹소켓
+	// 웹소켓 - 실시간 통신
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	implementation 'org.webjars:sockjs-client:1.1.2'
+	// STOMP - 구독
 	implementation 'org.webjars:stomp-websocket:2.3.3'
 
 	compileOnly 'org.projectlombok:lombok'

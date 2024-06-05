@@ -69,8 +69,20 @@ public class JWTUtil {
         return claim;
     }
 
+    // 토큰에서 사용자 정보 추출 메서드
+    public static String getUsernameFromToken(String token) {
+        return (String) validateToken(token).get("username");
+    }
 
-
-
+    // 토큰 유효성 확인 메서드
+    public static boolean isValidToken(String token) {
+        try {
+            validateToken(token);
+            return true;
+        } catch (CustomJWTException e) {
+            log.info("Token validation error: {}", e.getMessage());
+            return false;
+        }
+    }
 
 }

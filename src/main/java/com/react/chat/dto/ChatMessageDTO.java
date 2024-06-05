@@ -15,10 +15,9 @@ import java.time.LocalDateTime;
 public class ChatMessageDTO {
     private Long id;
     private MessageType MessageType;
-    private String message;
+    private String content;
+    private Member sender;
+    private ChatRoom ChatRoom;
 //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
-    private Member senderId;
-    private ChatRoom chatRoomId;
-
 }

@@ -15,22 +15,29 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatMessage extends BaseEntityCreatedDate {
+
+    public enum MessageType {
+        ENTER, MESSAGE, LEAVE;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String message;
-    private LocalDateTime timestamp;
+    @Enumerated(EnumType.STRING)
+    private MessageType messageType;
 
-//    private MessageType messageType;
+    @Column(nullable = false)
+    private String content;
 
     @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
     private Member sender;
 
-    @Setter
     @ManyToOne
     @JoinColumn(name = "chatroom_id", nullable = false)
     private ChatRoom chatRoom;
 
+    @Column(nullable = false)
+    private LocalDateTime timestamp;
 }
