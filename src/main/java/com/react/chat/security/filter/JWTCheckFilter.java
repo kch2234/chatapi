@@ -17,7 +17,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -29,14 +28,14 @@ public class JWTCheckFilter extends OncePerRequestFilter {
   protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
 
     // Preflight 필터 체크 X (Ajax CORS 요청 전에 날리는것)
-    if(request.getMethod().equals("OPTIONS")) {
+    if (request.getMethod().equals("OPTIONS")) {
       return true;
     }
 
     String requestURI = request.getRequestURI();
     log.info("***** JWTCheckFilter - shouldNotFilter : requestURI : {}", requestURI);
     // 필터 체크 안 하는 경로
-    if(requestURI.startsWith("/api/member/")) {
+    if (requestURI.startsWith("/api/member/")) {
       return true;
     }
     // 추후 이미지 경로로 수정
@@ -46,9 +45,22 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     return false;
   }
 
+  // 리스트를 LocalDateTime으로 변환하는 메서드 추가
+  private LocalDateTime convertToLocalDateTime(List<?> dateList) {
+    return LocalDateTime.of(
+            ((Number) dateList.get(0)).intValue(),
+            ((Number) dateList.get(1)).intValue(),
+            ((Number) dateList.get(2)).intValue(),
+            ((Number) dateList.get(3)).intValue(),
+            ((Number) dateList.get(4)).intValue(),
+            ((Number) dateList.get(5)).intValue(),
+            ((Number) dateList.get(6)).intValue()
+    );
+  }
+
   // 필터링 로직 작성 (추상메서드)
   @Override
-  protected void doFilterInternal( HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
     log.info("***** JWTCheckFilter - doFilterInternal!");
 
     String authValue = request.getHeader("Authorization");
@@ -64,17 +76,15 @@ public class JWTCheckFilter extends OncePerRequestFilter {
       Map<String, Object> claims = JWTUtil.validateToken(accessToken);
       log.info("********* doFilterInternal - claims : {}", claims);
 
-      DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-
       // 인증 정보 claims로 MemberDTO 구성 -> 시큐리티에 반영 추가 (시큐리티용 권한)
       Long id = ((Number) claims.get("id")).longValue();
       String email = (String) claims.get("email");
       String nickname = (String) claims.get("nickname");
-      String password = (String) claims.get("password");
-      List<ProfileImageDTO> profileImageDTO = (List<ProfileImageDTO>) claims.get("profileImageDTO");
-      String phone = (String) claims.get("phone");
-      String introduction = (String) claims.get("introduction");
-      LocalDateTime birth = LocalDateTime.parse((String) claims.get("birth"), formatter);
+      String password = claims.containsKey("password") ? (String) claims.get("password") : "";
+      List<ProfileImageDTO> profileImageDTO = claims.containsKey("profileImageDTO") ? (List<ProfileImageDTO>) claims.get("profileImageDTO") : List.of();
+      String phone = claims.containsKey("phone") ? (String) claims.get("phone") : null;
+      String introduction = claims.containsKey("introduction") ? (String) claims.get("introduction") : null;
+      LocalDateTime birth = LocalDateTime.parse((String) claims.get("birth"));
       String nationality = (String) claims.get("nationality");
       Gender gender = Gender.valueOf((String) claims.get("gender"));
       Role role = Role.valueOf((String) claims.get("role"));
@@ -82,17 +92,23 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
       LocalDateTime disabledDate = null;
       if (claims.get("disabledDate") != null) {
-        disabledDate = LocalDateTime.parse((String) claims.get("disabledDate"), formatter);
+        disabledDate = LocalDateTime.parse((String) claims.get("disabledDate"));
       }
 
       LocalDateTime createDate = null;
       if (claims.get("createDate") != null) {
-        createDate = LocalDateTime.parse((String) claims.get("createDate"), formatter);
+        List<?> createDateList = (List<?>) claims.get("createDate");
+        createDate = convertToLocalDateTime(createDateList);
       }
 
       LocalDateTime updateDate = null;
       if (claims.get("updateDate") != null) {
-        updateDate = LocalDateTime.parse((String) claims.get("updateDate"), formatter);
+        List<?> updateDateList = (List<?>) claims.get("updateDate");
+        updateDate = convertToLocalDateTime(updateDateList);
+      }
+
+      if (id == null || email == null || nickname == null || nationality == null || gender == null || role == null || disabled == null) {
+        throw new IllegalArgumentException("필수 값이 누락되었습니다.");
       }
 
       MemberDTO memberDTO = new MemberDTO(id, email, nickname, password, profileImageDTO, phone, introduction, birth, disabled, disabledDate, nationality, gender, role, createDate, updateDate);
@@ -102,9 +118,9 @@ public class JWTCheckFilter extends OncePerRequestFilter {
       SecurityContextHolder.getContext().setAuthentication(authenticationToken);
       filterChain.doFilter(request, response);
 
-    }catch (Exception e) {
+    } catch (Exception e) {
       log.error("***** JWTCheckFilter error!!!");
-      log.error(e.getMessage(),e);
+      log.error(e.getMessage(), e);
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
       Gson gson = new Gson();

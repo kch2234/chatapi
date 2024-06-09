@@ -1,7 +1,6 @@
 package com.react.chat.config.webSoket;
 
 import com.react.chat.config.webSoket.interceptor.WebSocketHandshakeInterceptor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -10,10 +9,27 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration
 @EnableWebSocketMessageBroker
-@RequiredArgsConstructor
-public class WebSoketConfig implements WebSocketMessageBrokerConfigurer {
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final WebSocketHandshakeInterceptor handshakeInterceptor;
+
+    public WebSocketConfig(WebSocketHandshakeInterceptor handshakeInterceptor) {
+        this.handshakeInterceptor = handshakeInterceptor;
+    }
+
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        // Client에서 websocket 연결할 때 사용할 API 경로를 설정 - 채팅용
+        registry.addEndpoint("/chat")
+                .setAllowedOriginPatterns("*")
+                .addInterceptors(handshakeInterceptor)
+                .withSockJS();
+        // Client에서 websocket 연결할 때 사용할 API 경로를 설정 - 매칭용
+        registry.addEndpoint("/match")
+                .setAllowedOriginPatterns("*")
+                .addInterceptors(handshakeInterceptor)
+                .withSockJS();
+    }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -23,17 +39,4 @@ public class WebSoketConfig implements WebSocketMessageBrokerConfigurer {
         config.setApplicationDestinationPrefixes("/pub");
     }
 
-    @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        //Client에서 websocket 연결할 때 사용할 API 경로를 설정 - 채팅용
-        registry.addEndpoint("/chat")
-                .setAllowedOriginPatterns("*")
-                .addInterceptors(handshakeInterceptor)
-                .withSockJS();
-        //Client에서 websocket 연결할 때 사용할 API 경로를 설정 - 매칭용
-        registry.addEndpoint("/match")
-                .setAllowedOriginPatterns("*")
-                .addInterceptors(handshakeInterceptor)
-                .withSockJS();
-    }
 }

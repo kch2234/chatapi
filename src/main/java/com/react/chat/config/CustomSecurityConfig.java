@@ -1,10 +1,14 @@
 package com.react.chat.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.gson.Gson;
 import com.react.chat.security.filter.JWTCheckFilter;
 import com.react.chat.security.handler.CustomAccessDeniedHandler;
 import com.react.chat.security.handler.CustomLoginFailureHandler;
 import com.react.chat.security.handler.CustomLoginSuccessHandler;
 import com.react.chat.security.handler.JwtAuthenticationEntryPoint;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +30,10 @@ import java.util.Arrays;
 @Slf4j
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class CustomSecurityConfig {
+
+  private final Gson gson;
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -45,7 +52,7 @@ public class CustomSecurityConfig {
     http.formLogin(login -> {
       login.loginPage("/api/member/login"); // 로그인 경로
       // 로그인 성공시 실행될 로직 클래스
-      login.successHandler(new CustomLoginSuccessHandler());
+      login.successHandler(new CustomLoginSuccessHandler(gson));
       // 로그인 실패시 실행될 로직 클래스
       login.failureHandler(new CustomLoginFailureHandler());
     });
@@ -80,6 +87,13 @@ public class CustomSecurityConfig {
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  public ObjectMapper objectMapper() {
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule());
+    return objectMapper;
   }
 
 }
