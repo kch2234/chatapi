@@ -31,15 +31,15 @@ class MemberRepositoryTest {
   public void testInsert() {
     for (int i = 0; i < 10; i++) {
       Member member = Member.builder()
-          .email("user" + i + "@test.com")
-          .password(passwordEncoder.encode("1234"))
-          .nickname("User" + i)
-          .birth(LocalDateTime.of(2024, 5, 31, 17, 23))
-          .nationality("한국")
-          .gender(Gender.MALE)
-          .role(Role.USER)
-          .build();
-      memberRepository.save(member); // 저장
+              .email("user" + i + "@test.com")
+              .password(passwordEncoder.encode("1234"))
+              .nickname("User" + i)
+              .birth(LocalDateTime.of(2024, 5, 31, 17, 23))
+              .nationality("한국")
+              .gender(Gender.MALE)
+              .role(Role.USER)
+              .build();
+      memberRepository.save(member);
     }// for
   }
 

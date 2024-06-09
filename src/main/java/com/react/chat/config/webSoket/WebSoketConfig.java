@@ -13,7 +13,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @RequiredArgsConstructor
 public class WebSoketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final WebSocketHandshakeInterceptor webSocketHandshakeInterceptor;
+    private final WebSocketHandshakeInterceptor handshakeInterceptor;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -28,12 +28,12 @@ public class WebSoketConfig implements WebSocketMessageBrokerConfigurer {
         //Client에서 websocket 연결할 때 사용할 API 경로를 설정 - 채팅용
         registry.addEndpoint("/chat")
                 .setAllowedOriginPatterns("*")
-                .addInterceptors(webSocketHandshakeInterceptor)
+                .addInterceptors(handshakeInterceptor)
                 .withSockJS();
         //Client에서 websocket 연결할 때 사용할 API 경로를 설정 - 매칭용
         registry.addEndpoint("/match")
                 .setAllowedOriginPatterns("*")
-                .addInterceptors(webSocketHandshakeInterceptor)
+                .addInterceptors(handshakeInterceptor)
                 .withSockJS();
     }
 }

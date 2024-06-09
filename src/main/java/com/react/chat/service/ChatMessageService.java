@@ -2,7 +2,6 @@ package com.react.chat.service;
 
 import com.react.chat.domain.chatting.ChatMessage;
 import com.react.chat.domain.chatting.ChatRoom;
-import com.react.chat.domain.enumFiles.MessageType;
 import com.react.chat.domain.member.Member;
 import com.react.chat.dto.ChatMessageDTO;
 import com.react.chat.repository.ChatMessageRepository;
@@ -12,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,6 +43,7 @@ public class ChatMessageService {
     }
 
     // 메시지 전송
+    @Transactional
     public ChatMessageDTO sendMessage(ChatMessageDTO messageDTO) {
         Optional<Member> findMember = memberRepository.findById(messageDTO.getSender().getId());
         Optional<ChatRoom> findRoom = chatRoomRepository.findById(messageDTO.getChatRoom().getId());
@@ -55,7 +56,7 @@ public class ChatMessageService {
             message.setMessageType(ChatMessage.MessageType.MESSAGE);
             chatMessageRepository.save(message);
             ChatMessageDTO savedMessageDTO = modelMapper.map(message, ChatMessageDTO.class);
-            template.convertAndSend("/sub/chat/room/" + messageDTO.getChatRoom(), savedMessageDTO);
+            template.convertAndSend("/sub/chat/room/" + messageDTO.getChatRoom().getId(), savedMessageDTO);
             chatRoomRepository.updateLastMessage(message.getChatRoom().getId(), message.getTimestamp(), message.getContent());
             return savedMessageDTO;
         } else {
@@ -63,6 +64,7 @@ public class ChatMessageService {
         }
     }
 
+    @Transactional
     public ChatMessageDTO addUser(ChatMessageDTO messageDTO) {
         Optional<Member> findMember = memberRepository.findById(messageDTO.getSender().getId());
         Optional<ChatRoom> findRoom = chatRoomRepository.findById(messageDTO.getChatRoom().getId());
@@ -76,7 +78,7 @@ public class ChatMessageService {
             message.setMessageType(ChatMessage.MessageType.ENTER);
             chatMessageRepository.save(message);
             ChatMessageDTO savedMessageDTO = modelMapper.map(message, ChatMessageDTO.class);
-            template.convertAndSend("/sub/chat/room/" + messageDTO.getChatRoom(), savedMessageDTO);
+            template.convertAndSend("/sub/chat/room/" + messageDTO.getChatRoom().getId(), savedMessageDTO);
             chatRoomRepository.updateLastMessage(message.getChatRoom().getId(), message.getTimestamp(), message.getContent());
             return savedMessageDTO;
         } else {
@@ -84,6 +86,7 @@ public class ChatMessageService {
         }
     }
 
+    @Transactional
     public ChatMessageDTO leaveUser(ChatMessageDTO messageDTO) {
         Optional<Member> findMember = memberRepository.findById(messageDTO.getSender().getId());
         Optional<ChatRoom> findRoom = chatRoomRepository.findById(messageDTO.getChatRoom().getId());
@@ -97,7 +100,7 @@ public class ChatMessageService {
             message.setMessageType(ChatMessage.MessageType.LEAVE);
             chatMessageRepository.save(message);
             ChatMessageDTO savedMessageDTO = modelMapper.map(message, ChatMessageDTO.class);
-            template.convertAndSend("/sub/chat/room/" + messageDTO.getChatRoom(), savedMessageDTO);
+            template.convertAndSend("/sub/chat/room/" + messageDTO.getChatRoom().getId(), savedMessageDTO);
             chatRoomRepository.updateLastMessage(message.getChatRoom().getId(), message.getTimestamp(), message.getContent());
             return savedMessageDTO;
         } else {

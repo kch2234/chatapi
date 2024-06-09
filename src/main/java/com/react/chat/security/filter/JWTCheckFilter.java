@@ -10,15 +10,14 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -55,27 +54,46 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     String authValue = request.getHeader("Authorization");
     log.info("***** doFilterInternal - authValue : {}", authValue);
 
+    if (authValue == null || !authValue.startsWith("Bearer ")) {
+      filterChain.doFilter(request, response);
+      return;
+    }
+
     try {
       String accessToken = authValue.substring(7);
       Map<String, Object> claims = JWTUtil.validateToken(accessToken);
       log.info("********* doFilterInternal - claims : {}", claims);
 
+      DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+
       // 인증 정보 claims로 MemberDTO 구성 -> 시큐리티에 반영 추가 (시큐리티용 권한)
-      Long id = (Long) claims.get("id");
+      Long id = ((Number) claims.get("id")).longValue();
       String email = (String) claims.get("email");
       String nickname = (String) claims.get("nickname");
       String password = (String) claims.get("password");
       List<ProfileImageDTO> profileImageDTO = (List<ProfileImageDTO>) claims.get("profileImageDTO");
       String phone = (String) claims.get("phone");
       String introduction = (String) claims.get("introduction");
-      LocalDateTime birth = (LocalDateTime) claims.get("birth");
+      LocalDateTime birth = LocalDateTime.parse((String) claims.get("birth"), formatter);
       String nationality = (String) claims.get("nationality");
-      Gender gender = (Gender) claims.get("gender");
-      Role role = (Role) claims.get("role");
+      Gender gender = Gender.valueOf((String) claims.get("gender"));
+      Role role = Role.valueOf((String) claims.get("role"));
       Boolean disabled = (Boolean) claims.get("disabled");
-      LocalDateTime disabledDate = (LocalDateTime) claims.get("disabledDate");
-      LocalDateTime createDate = (LocalDateTime) claims.get("createDate");
-      LocalDateTime updateDate = (LocalDateTime) claims.get("updateDate");
+
+      LocalDateTime disabledDate = null;
+      if (claims.get("disabledDate") != null) {
+        disabledDate = LocalDateTime.parse((String) claims.get("disabledDate"), formatter);
+      }
+
+      LocalDateTime createDate = null;
+      if (claims.get("createDate") != null) {
+        createDate = LocalDateTime.parse((String) claims.get("createDate"), formatter);
+      }
+
+      LocalDateTime updateDate = null;
+      if (claims.get("updateDate") != null) {
+        updateDate = LocalDateTime.parse((String) claims.get("updateDate"), formatter);
+      }
 
       MemberDTO memberDTO = new MemberDTO(id, email, nickname, password, profileImageDTO, phone, introduction, birth, disabled, disabledDate, nationality, gender, role, createDate, updateDate);
 
@@ -86,7 +104,8 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
     }catch (Exception e) {
       log.error("***** JWTCheckFilter error!!!");
-      log.error(e.getMessage());
+      log.error(e.getMessage(),e);
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
       Gson gson = new Gson();
       String msg = gson.toJson(Map.of("error", "ERROR_ACCESS_TOKEN"));

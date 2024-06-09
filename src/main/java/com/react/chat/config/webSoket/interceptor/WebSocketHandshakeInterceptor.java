@@ -1,6 +1,7 @@
 package com.react.chat.config.webSoket.interceptor;
 
 import com.react.chat.util.JWTUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;

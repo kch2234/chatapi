@@ -1,8 +1,12 @@
 package com.react.chat.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.JacksonSerializer;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.io.UnsupportedEncodingException;
@@ -12,7 +16,13 @@ import java.util.Map;
 
 // JWT 관련 처리해줄 클래스
 @Slf4j
+@Component
 public class JWTUtil {
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    static {
+        objectMapper.registerModule(new JavaTimeModule());
+    }
 
     // 인코딩된 키
     private static String key = "SGVsbG9Kc29uV2ViVG9rZW5BdXRoZW50aWNhdGlvbldpdGhTcHJpbmdCb290UHJvamVjdFNlY3JldEtleQ";
@@ -34,6 +44,7 @@ public class JWTUtil {
                 .setClaims(valueMap) // 페이로드(Claim)에 추가할 (사용자관련)데이터
                 .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
                 .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(min).toInstant()))
+                .serializeToJsonWith(new JacksonSerializer<>(objectMapper)) // JacksonSerializer 사용
                 .signWith(secretKey) // 비밀키로 서명
                 .compact();// 토큰 생성 -> 문자열 리턴
         log.info("jwtStr : {}", jwtStr);
@@ -56,14 +67,14 @@ public class JWTUtil {
                     .getBody();// claim 리턴
         } catch (MalformedJwtException e) { // 잘못된 형식의 토큰 예외
             throw new CustomJWTException("Malformed");
-        }catch (ExpiredJwtException e) { // 만료된 토큰 예외
+        } catch (ExpiredJwtException e) { // 만료된 토큰 예외
             throw new CustomJWTException("Expired");
-        }catch (InvalidClaimException e) { // 유효하지 않는 Claim시 예외
+        } catch (InvalidClaimException e) { // 유효하지 않는 Claim시 예외
             throw new CustomJWTException("Invalid");
-        }catch (JwtException e) { // 그 외 Jwt 관련 예외
+        } catch (JwtException e) { // 그 외 Jwt 관련 예외
             log.info("JwtException : {}", e.getMessage());
             throw new CustomJWTException("JWTError");
-        }catch (Exception e) { // 그 외 나머지 예외
+        } catch (Exception e) { // 그 외 나머지 예외
             throw new CustomJWTException("Error");
         }
         return claim;
@@ -84,5 +95,4 @@ public class JWTUtil {
             return false;
         }
     }
-
 }

@@ -5,11 +5,12 @@ import com.react.chat.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,5 +29,8 @@ public class ChatRoom extends BaseEntityCreatedDate {
     )
     @Builder.Default
     private Set<Member> members = new HashSet<>();
+
+    private String lastMessage;
+    private LocalDateTime lastMessageTime;
 }
 
