@@ -59,13 +59,9 @@ public class CustomSecurityConfig {
 
     // 웹소켓 허용 경로 추가
     http.authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/api/member/login").permitAll() // 로그인 경로 허용
             .requestMatchers("/chat/**").permitAll() // 웹소켓 엔드포인트 허용
-            .requestMatchers("/match/**").permitAll()
             .anyRequest().authenticated()
-    );
-
-    http.addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class);
+    ).addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class);
 
     // 접근 제한(허용X) 되었을 경우 예외 처리
     http.exceptionHandling(exception -> {

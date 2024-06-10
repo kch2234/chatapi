@@ -33,7 +33,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     String requestURI = request.getRequestURI();
     log.info("***** JWTCheckFilter - shouldNotFilter : requestURI : {}", requestURI);
     // 필터 체크 안 하는 경로
-    return requestURI.startsWith("/api/member/");
+    return requestURI.startsWith("/api/member/login") || requestURI.startsWith("/chat") || requestURI.startsWith("/match");
   }
 
   @Override

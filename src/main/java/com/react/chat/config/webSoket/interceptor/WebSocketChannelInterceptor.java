@@ -16,10 +16,11 @@ import java.util.Map;
 @Slf4j
 public class WebSocketChannelInterceptor implements ChannelInterceptor {
 
-    @SneakyThrows
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        log.info("WebSocket Command: {}", accessor.getCommand());
+
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
             String authToken = accessor.getFirstNativeHeader("Authorization");
             log.info("WebSocket CONNECT - authToken: {}", authToken);
