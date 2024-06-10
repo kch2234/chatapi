@@ -45,7 +45,7 @@ public class CustomSecurityConfig {
     });
     // session stateless
     http.sessionManagement(sessionConfig ->
-        sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+            sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
     // csrf disable
     http.csrf(csrf -> csrf.disable());
 
@@ -56,6 +56,14 @@ public class CustomSecurityConfig {
       // 로그인 실패시 실행될 로직 클래스
       login.failureHandler(new CustomLoginFailureHandler());
     });
+
+    // 웹소켓 허용 경로 추가
+    http.authorizeHttpRequests(authorize -> authorize
+            .requestMatchers("/api/member/login").permitAll() // 로그인 경로 허용
+            .requestMatchers("/chat/**").permitAll() // 웹소켓 엔드포인트 허용
+            .requestMatchers("/match/**").permitAll()
+            .anyRequest().authenticated()
+    );
 
     http.addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class);
 
@@ -95,5 +103,4 @@ public class CustomSecurityConfig {
     objectMapper.registerModule(new JavaTimeModule());
     return objectMapper;
   }
-
 }

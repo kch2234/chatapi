@@ -23,10 +23,8 @@ import java.util.Map;
 @Slf4j
 public class JWTCheckFilter extends OncePerRequestFilter {
 
-  // 생략 필터 메서드 추가
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-
     // Preflight 필터 체크 X (Ajax CORS 요청 전에 날리는것)
     if (request.getMethod().equals("OPTIONS")) {
       return true;
@@ -35,14 +33,82 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     String requestURI = request.getRequestURI();
     log.info("***** JWTCheckFilter - shouldNotFilter : requestURI : {}", requestURI);
     // 필터 체크 안 하는 경로
-    if (requestURI.startsWith("/api/member/")) {
-      return true;
+    return requestURI.startsWith("/api/member/");
+  }
+
+  @Override
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    log.info("***** JWTCheckFilter - doFilterInternal!");
+
+    String authValue = request.getHeader("Authorization");
+    log.info("***** doFilterInternal - authValue : {}", authValue);
+
+    if (authValue == null || !authValue.startsWith("Bearer ")) {
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      return;
     }
-    // 추후 이미지 경로로 수정
-/*    if(requestURI.startsWith("")) {
-      return true;
-    }*/
-    return false;
+
+    String accessToken = authValue.substring(7);
+    log.info("***** doFilterInternal - accessToken : {}", accessToken);
+    try {
+      Map<String, Object> claims = JWTUtil.validateToken(accessToken);
+      log.info("********* doFilterInternal - claims : {}", claims);
+      if (claims != null) {
+        // 인증 정보 claims로 MemberDTO 구성 -> 시큐리티에 반영 추가 (시큐리티용 권한)
+        Long id = ((Number) claims.get("id")).longValue();
+        String email = (String) claims.get("email");
+        String nickname = (String) claims.get("nickname");
+        String password = claims.containsKey("password") ? (String) claims.get("password") : "";
+        List<ProfileImageDTO> profileImageDTO = claims.containsKey("profileImageDTO") ? (List<ProfileImageDTO>) claims.get("profileImageDTO") : List.of();
+        String phone = claims.containsKey("phone") ? (String) claims.get("phone") : null;
+        String introduction = claims.containsKey("introduction") ? (String) claims.get("introduction") : null;
+        LocalDateTime birth = LocalDateTime.parse((String) claims.get("birth"));
+        String nationality = (String) claims.get("nationality");
+        Gender gender = Gender.valueOf((String) claims.get("gender"));
+        Role role = Role.valueOf((String) claims.get("role"));
+        Boolean disabled = (Boolean) claims.get("disabled");
+
+        LocalDateTime disabledDate = null;
+        if (claims.get("disabledDate") != null) {
+          disabledDate = LocalDateTime.parse((String) claims.get("disabledDate"));
+        }
+
+        LocalDateTime createDate = null;
+        if (claims.get("createDate") != null) {
+          List<?> createDateList = (List<?>) claims.get("createDate");
+          createDate = convertToLocalDateTime(createDateList);
+        }
+
+        LocalDateTime updateDate = null;
+        if (claims.get("updateDate") != null) {
+          List<?> updateDateList = (List<?>) claims.get("updateDate");
+          updateDate = convertToLocalDateTime(updateDateList);
+        }
+
+        if (id == null || email == null || nickname == null || nationality == null || gender == null || role == null || disabled == null) {
+          throw new IllegalArgumentException("필수 값이 누락되었습니다.");
+        }
+
+        MemberDTO memberDTO = new MemberDTO(id, email, nickname, password, profileImageDTO, phone, introduction, birth, disabled, disabledDate, nationality, gender, role, createDate, updateDate);
+        log.info("******** doFileterInternal - memberDTO : {}", memberDTO);
+
+        // 시큐리티 인증 추가 JWT <-> SpringSecurity 로그인 상태 호환
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO, password, memberDTO.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+      }
+      filterChain.doFilter(request, response); // 필터 체인을 통해 요청을 계속 진행합니다.
+    } catch (Exception e) {
+      log.error("***** JWTCheckFilter error!!!");
+      log.error(e.getMessage());
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+      Gson gson = new Gson();
+      String msg = gson.toJson(Map.of("error", "ERROR_ACCESS_TOKEN"));
+      response.setContentType("application/json");
+      PrintWriter writer = response.getWriter();
+      writer.println(msg);
+      writer.close();
+    }
   }
 
   // 리스트를 LocalDateTime으로 변환하는 메서드 추가
@@ -56,79 +122,5 @@ public class JWTCheckFilter extends OncePerRequestFilter {
             ((Number) dateList.get(5)).intValue(),
             ((Number) dateList.get(6)).intValue()
     );
-  }
-
-  // 필터링 로직 작성 (추상메서드)
-  @Override
-  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-    log.info("***** JWTCheckFilter - doFilterInternal!");
-
-    String authValue = request.getHeader("Authorization");
-    log.info("***** doFilterInternal - authValue : {}", authValue);
-
-    if (authValue == null || !authValue.startsWith("Bearer ")) {
-      filterChain.doFilter(request, response);
-      return;
-    }
-
-    try {
-      String accessToken = authValue.substring(7);
-      Map<String, Object> claims = JWTUtil.validateToken(accessToken);
-      log.info("********* doFilterInternal - claims : {}", claims);
-
-      // 인증 정보 claims로 MemberDTO 구성 -> 시큐리티에 반영 추가 (시큐리티용 권한)
-      Long id = ((Number) claims.get("id")).longValue();
-      String email = (String) claims.get("email");
-      String nickname = (String) claims.get("nickname");
-      String password = claims.containsKey("password") ? (String) claims.get("password") : "";
-      List<ProfileImageDTO> profileImageDTO = claims.containsKey("profileImageDTO") ? (List<ProfileImageDTO>) claims.get("profileImageDTO") : List.of();
-      String phone = claims.containsKey("phone") ? (String) claims.get("phone") : null;
-      String introduction = claims.containsKey("introduction") ? (String) claims.get("introduction") : null;
-      LocalDateTime birth = LocalDateTime.parse((String) claims.get("birth"));
-      String nationality = (String) claims.get("nationality");
-      Gender gender = Gender.valueOf((String) claims.get("gender"));
-      Role role = Role.valueOf((String) claims.get("role"));
-      Boolean disabled = (Boolean) claims.get("disabled");
-
-      LocalDateTime disabledDate = null;
-      if (claims.get("disabledDate") != null) {
-        disabledDate = LocalDateTime.parse((String) claims.get("disabledDate"));
-      }
-
-      LocalDateTime createDate = null;
-      if (claims.get("createDate") != null) {
-        List<?> createDateList = (List<?>) claims.get("createDate");
-        createDate = convertToLocalDateTime(createDateList);
-      }
-
-      LocalDateTime updateDate = null;
-      if (claims.get("updateDate") != null) {
-        List<?> updateDateList = (List<?>) claims.get("updateDate");
-        updateDate = convertToLocalDateTime(updateDateList);
-      }
-
-      if (id == null || email == null || nickname == null || nationality == null || gender == null || role == null || disabled == null) {
-        throw new IllegalArgumentException("필수 값이 누락되었습니다.");
-      }
-
-      MemberDTO memberDTO = new MemberDTO(id, email, nickname, password, profileImageDTO, phone, introduction, birth, disabled, disabledDate, nationality, gender, role, createDate, updateDate);
-
-      // 시큐리티 인증 추가 JWT <-> SpringSecurity 로그인 상태 호환
-      UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO, password, memberDTO.getAuthorities());
-      SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-      filterChain.doFilter(request, response);
-
-    } catch (Exception e) {
-      log.error("***** JWTCheckFilter error!!!");
-      log.error(e.getMessage(), e);
-      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-
-      Gson gson = new Gson();
-      String msg = gson.toJson(Map.of("error", "ERROR_ACCESS_TOKEN"));
-      response.setContentType("application/json");
-      PrintWriter writer = response.getWriter();
-      writer.println(msg);
-      writer.close();
-    }
   }
 }
