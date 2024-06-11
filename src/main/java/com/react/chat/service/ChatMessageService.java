@@ -43,8 +43,6 @@ public class ChatMessageService {
         }
     }
 
-    // 채팅방 생성
-
     // 메시지 전송
     @Transactional
     public ChatMessageDTO sendMessage(ChatMessageDTO messageDTO) {

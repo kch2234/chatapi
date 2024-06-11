@@ -30,7 +30,11 @@ public class ChatRoom extends BaseEntityCreatedDate {
     @Builder.Default
     private Set<Member> members = new HashSet<>();
 
+    @Setter
     private String lastMessage;
+    @Setter
     private LocalDateTime lastMessageTime;
+
+    // 필드 수정 메서드 추가
 }
 

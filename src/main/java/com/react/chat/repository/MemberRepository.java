@@ -1,5 +1,7 @@
 package com.react.chat.repository;
 
+import com.react.chat.domain.enumFiles.Gender;
+import com.react.chat.domain.member.Interest;
 import com.react.chat.domain.member.Member;
 import com.react.chat.domain.member.ProfileImage;
 import com.react.chat.dto.ProfileImageDTO;
@@ -8,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, String> {
@@ -16,4 +19,6 @@ public interface MemberRepository extends JpaRepository<Member, String> {
   Member getMemberByEmail(@Param("email") String email);
 
   Optional<Member> findById(Long id);
+
+  List<Member> findByMatching(Interest interest, Gender gender, String nationality);
 }

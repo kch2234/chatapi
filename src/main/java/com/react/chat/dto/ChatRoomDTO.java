@@ -15,5 +15,6 @@ import java.util.Set;
 public class ChatRoomDTO {
     private Long id;
     private String name;
-    private Set<Member> members;
+    private Long sender;
+    private Long receiver;
 }

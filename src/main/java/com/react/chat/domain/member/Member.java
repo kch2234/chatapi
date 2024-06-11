@@ -93,5 +93,4 @@ public class Member extends BaseEntityUpdatedDate {
     public void changeNationality(String nationality) {
         this.nationality = nationality;
     }
-
 }
