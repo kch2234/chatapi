@@ -3,6 +3,7 @@ package com.react.chat.config.webSoket;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.react.chat.domain.enumFiles.MessageType;
 import com.react.chat.dto.ChatMessageDTO;
+import com.react.chat.service.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,7 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 public class WebSoketChatHandler extends TextWebSocketHandler {
+    private final ChatMessageService chatMessageService;
     private final ObjectMapper mapper;
     // 현재 연결된 웹소켓 세션들을 담는 Set
     private final Set<WebSocketSession> sessions = new HashSet<>();
@@ -60,6 +62,12 @@ public class WebSoketChatHandler extends TextWebSocketHandler {
         // 메시지 타입에 따라 처리
         if (chatMessageDTO.getMessageType().equals(MessageType.ENTER)) {
             chatRoomSessionMap.get(chatRoomId).add(session);
+            chatMessageService.addUser(chatMessageDTO);
+        }else if (chatMessageDTO.getMessageType().equals(MessageType.LEAVE)) {
+            chatRoomSessionMap.get(chatRoomId).remove(session);
+            chatMessageService.leaveUser(chatMessageDTO);
+        } else if (chatMessageDTO.getMessageType().equals(MessageType.MESSAGE)) {
+            chatMessageService.sendMessage(chatMessageDTO);
         }
 
         // 연결이 끊어진 세션 제거

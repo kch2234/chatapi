@@ -4,6 +4,7 @@ import com.react.chat.domain.chatting.ChatMessage;
 import com.react.chat.domain.chatting.ChatRoom;
 import com.react.chat.domain.member.Member;
 import com.react.chat.dto.ChatMessageDTO;
+import com.react.chat.dto.ChatRoomDTO;
 import com.react.chat.repository.ChatMessageRepository;
 import com.react.chat.repository.ChatRoomRepository;
 import com.react.chat.repository.MemberRepository;
@@ -41,6 +42,8 @@ public class ChatMessageService {
             throw new IllegalArgumentException("존재하지 않는 채팅방입니다.");
         }
     }
+
+    // 채팅방 생성
 
     // 메시지 전송
     @Transactional

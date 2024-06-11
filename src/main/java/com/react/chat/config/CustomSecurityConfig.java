@@ -25,6 +25,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 @Slf4j
@@ -38,7 +39,6 @@ public class CustomSecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     log.info("***** security config!");
-
     // cors
     http.cors(corsConfigurer -> {
       corsConfigurer.configurationSource(corsConfigurationSource());
@@ -59,9 +59,13 @@ public class CustomSecurityConfig {
 
     // 웹소켓 허용 경로 추가
     http.authorizeHttpRequests(authorize -> authorize
+            .requestMatchers("/api/member/login").permitAll() // 로그인 경로 허용
             .requestMatchers("/chat/**").permitAll() // 웹소켓 엔드포인트 허용
+            .requestMatchers("/match/**").permitAll()
             .anyRequest().authenticated()
-    ).addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class);
+    );
+
+    http.addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class);
 
     // 접근 제한(허용X) 되었을 경우 예외 처리
     http.exceptionHandling(exception -> {
@@ -80,6 +84,8 @@ public class CustomSecurityConfig {
     configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE"));
     configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
     configuration.setAllowCredentials(true);
+//    configuration.setMaxAge(3600L);
+//    configuration.setExposedHeaders(Collections.singletonList("Authorization"));
 
     // 위 설정정보를 토대로 Url 전체 경로에 적용하는 CORS 설정 소스 생성해 리턴
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

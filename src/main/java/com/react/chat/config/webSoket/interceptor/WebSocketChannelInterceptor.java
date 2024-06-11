@@ -10,12 +10,11 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 @Component
 @Slf4j
 public class WebSocketChannelInterceptor implements ChannelInterceptor {
 
+    @SneakyThrows
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
@@ -30,9 +29,14 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
                 log.info("WebSocket CONNECT - token: {}", token);
 
                 try {
-                    Map<String, Object> claims = JWTUtil.validateToken(token);
-                    log.info("WebSocket CONNECT - claims: {}", claims);
-                    accessor.setHeader("claims", claims);
+                    if (JWTUtil.isValidToken(token)) {
+                        String username = JWTUtil.getUsernameFromToken(token);
+                        log.info("WebSocket CONNECT - username: {}", username);
+                        accessor.setHeader("username", username);
+                    } else {
+                        log.error("Invalid JWT token");
+                        throw new IllegalArgumentException("Invalid JWT token");
+                    }
                 } catch (Exception e) {
                     log.error("JWT 검증 실패: {}", e.getMessage());
                     throw new IllegalArgumentException("Invalid JWT token");
@@ -45,3 +49,4 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
         return message;
     }
 }
+
