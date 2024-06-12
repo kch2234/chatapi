@@ -25,7 +25,7 @@ import java.util.UUID;
 @Slf4j
 public class FileUtilCustom {
 
-  @Value("${chat.upload.path}") // import 주의! springframework 꺼
+  @Value("${chatapi.upload.path}") // import 주의! springframework 꺼
   private String uploadPath;
 
   @PostConstruct
