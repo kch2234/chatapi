@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     String requestURI = request.getRequestURI();
     log.info("***** JWTCheckFilter - shouldNotFilter : requestURI : {}", requestURI);
     // 필터 체크 안 하는 경로
-    if(requestURI.startsWith("/api/member/")) {
+    if(requestURI.startsWith("/signup")) {
       return true;
     }
     // 추후 이미지 경로로 수정
@@ -60,21 +61,10 @@ public class JWTCheckFilter extends OncePerRequestFilter {
       // 인증 정보 claims로 MemberDTO 구성 -> 시큐리티에 반영 추가 (시큐리티용 권한)
       Long id = (Long) claims.get("id");
       String email = (String) claims.get("email");
-      String nickname = (String) claims.get("nickname");
       String password = (String) claims.get("password");
-      List<ProfileImageDTO> profileImageDTO = (List<ProfileImageDTO>) claims.get("profileImageDTO");
-      String phone = (String) claims.get("phone");
-      String introduction = (String) claims.get("introduction");
-      LocalDateTime birth = (LocalDateTime) claims.get("birth");
-      String nationality = (String) claims.get("nationality");
-      Gender gender = (Gender) claims.get("gender");
       Role role = (Role) claims.get("role");
-      Boolean disabled = (Boolean) claims.get("disabled");
-      LocalDateTime disabledDate = (LocalDateTime) claims.get("disabledDate");
-      LocalDateTime createDate = (LocalDateTime) claims.get("createDate");
-      LocalDateTime updateDate = (LocalDateTime) claims.get("updateDate");
 
-      MemberDTO memberDTO = new MemberDTO(id, email, nickname, password, profileImageDTO, phone, introduction, birth, disabled, disabledDate, nationality, gender, role, createDate, updateDate);
+      MemberDTO memberDTO = new MemberDTO(id, email, password, role);
 
       // 시큐리티 인증 추가 JWT <-> SpringSecurity 로그인 상태 호환
       UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO, password, memberDTO.getAuthorities());

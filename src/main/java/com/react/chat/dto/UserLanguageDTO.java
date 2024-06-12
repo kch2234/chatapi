@@ -14,5 +14,5 @@ import lombok.NoArgsConstructor;
 public class UserLanguageDTO {
     private Long id;
     private Member memberId;
-    private UserLanguages language;
+    private UserLanguages userLanguages;
 }
