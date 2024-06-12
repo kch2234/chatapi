@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -14,27 +13,29 @@ import org.springframework.stereotype.Controller;
 @Slf4j
 public class MessageController {
 
-    private final SimpMessagingTemplate messagingTemplate;
     private final ChatMessageService chatMessageService;
 
     @MessageMapping("/chat/enter")
-    @SendTo("/topic/chat/room")
+    @SendTo("/sub/chat/roomId")
     public ChatMessageDTO enter(ChatMessageDTO messageDTO) {
         log.info("Received message - enter: {}", messageDTO);
-        return chatMessageService.addUser(messageDTO);
+        chatMessageService.addUser(messageDTO);
+        return messageDTO;
     }
 
     @MessageMapping("/chat/message")
-    @SendTo("/topic/chat/room")
+    @SendTo("/pub/chat/message")
     public ChatMessageDTO message(ChatMessageDTO messageDTO) {
         log.info("Received message - message: {}", messageDTO);
-        return chatMessageService.sendMessage(messageDTO);
+        chatMessageService.sendMessage(messageDTO);
+        return messageDTO;
     }
 
     @MessageMapping("/chat/leave")
-    @SendTo("/topic/chat/room")
+    @SendTo("/sub/chat/roomId")
     public ChatMessageDTO leave(ChatMessageDTO messageDTO) {
         log.info("Received message - leave: {}", messageDTO);
-        return chatMessageService.leaveUser(messageDTO);
+        chatMessageService.leaveUser(messageDTO);
+        return messageDTO;
     }
 }

@@ -2,14 +2,10 @@ package com.react.chat.config.webSoket;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.simp.stomp.*;
 import org.springframework.messaging.support.MessageHeaderAccessor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.*;
-
-import java.util.Objects;
 
 @Slf4j
 @Component
@@ -22,18 +18,13 @@ public class WebSocketEventHandler {
     }
 
     private void logConnectEvent(SessionConnectEvent event) {
-
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(event.getMessage(), StompHeaderAccessor.class);
-
-        Authentication authentication = (Authentication) Objects.requireNonNull(accessor.getUser());
-        String username = authentication.getName();
-        String userRole = authentication.getAuthorities()
-                .stream()
-                .findFirst()
-                .map(GrantedAuthority::getAuthority)
-                .orElseThrow(() -> new IllegalArgumentException("User role is not exist."));
-
-        log.info("WebSocket {}: username={}, userRole={}", event.getClass().getSimpleName(), username, userRole);
+        if (accessor != null && accessor.getUser() != null) {
+            String username = accessor.getUser().getName();
+            log.info("WebSocket {}: username={}", event.getClass().getSimpleName(), username);
+        } else {
+            log.info("WebSocket {}: No User Information", event.getClass().getSimpleName());
+        }
     }
 
     @EventListener
