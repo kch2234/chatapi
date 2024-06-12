@@ -1,8 +1,8 @@
 package com.react.chat.controller;
 
 import com.react.chat.dto.MemberDTO;
-import com.react.chat.dto.MemberFormDTO;
-import com.react.chat.service.MemberService;
+//import com.react.chat.dto.MemberFormDTO;
+//import com.react.chat.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,6 +18,7 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 public class LoginController {
+/*
 
   private final MemberService memberService;
 
@@ -27,5 +28,6 @@ public class LoginController {
     Long memberId = memberService.signup(memberFormDTO);
     return ResponseEntity.ok(memberId);
   }
+*/
 
 }

@@ -20,5 +20,5 @@ public interface MemberRepository extends JpaRepository<Member, String> {
 
   Optional<Member> findById(Long id);
 
-  List<Member> findByMatching(Interest interest, Gender gender, String nationality);
+//  List<Member> findByMatching(Interest interest, Gender gender, String nationality);
 }

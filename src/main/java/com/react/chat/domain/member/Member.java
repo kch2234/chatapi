@@ -2,29 +2,21 @@ package com.react.chat.domain.member;
 
 import com.react.chat.domain.baseEntity.BaseEntityUpdatedDate;
 import com.react.chat.domain.chatting.ChatRoom;
+import com.react.chat.domain.chatting.ConversationRequest;
 import com.react.chat.domain.enumFiles.Gender;
 import com.react.chat.domain.enumFiles.Role;
-import com.react.chat.dto.MemberDTO;
-import com.react.chat.dto.ProfileImageDTO;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Entity
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(exclude = "profileImage")
 public class Member extends BaseEntityUpdatedDate {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 회원 번호
@@ -35,7 +27,8 @@ public class Member extends BaseEntityUpdatedDate {
     @Column(nullable = false, length = 500)
     private String password; // 비밀번호
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ElementCollection // 컬렉션 값 타입이라고 명시: default lazy 로딩
+    //@Builder.Default  // builer 패턴 -> = ... 값대입 시 반드시 부착
     private List<ProfileImage> profileImage; //프로필 이미지
 
     private String phone; // 전화번호
@@ -66,7 +59,19 @@ public class Member extends BaseEntityUpdatedDate {
 
     @ManyToMany(mappedBy = "members")
     @Builder.Default
-    private List<ChatRoom> chatRooms = new ArrayList<>();
+    private List<ChatRoom> chatRooms = new ArrayList<>(); // 채팅방
+
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ConversationRequest> sentRequests = new ArrayList<>(); // 보낸 대화 요청
+
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ConversationRequest> receivedRequests = new ArrayList<>(); // 받은 대화 요청
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Interest> interests = new ArrayList<>(); // 관심사
 
     // 필드 수정 메서드
     // 닉네임 수정

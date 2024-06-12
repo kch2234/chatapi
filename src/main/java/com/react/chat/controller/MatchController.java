@@ -31,7 +31,7 @@ public class MatchController {
 
     @PostMapping("/create")
     public ResponseEntity<ChatRoomDTO> createChatRoom(@RequestParam Long senderId, @RequestParam Long recipientId) {
-        ChatRoomDTO chatRoomDTO = chatRoomService.createChatRoom(senderId, recipientId);
+        ChatRoomDTO chatRoomDTO = matchService.createChatRoom(senderId, recipientId);
         return ResponseEntity.ok(chatRoomDTO);
     }
 

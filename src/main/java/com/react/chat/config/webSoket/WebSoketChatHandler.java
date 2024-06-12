@@ -3,7 +3,9 @@ package com.react.chat.config.webSoket;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.react.chat.domain.enumFiles.MessageType;
 import com.react.chat.dto.ChatMessageDTO;
+import com.react.chat.repository.ChatRoomRepository;
 import com.react.chat.service.ChatMessageService;
+import com.react.chat.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -23,6 +25,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class WebSoketChatHandler extends TextWebSocketHandler {
     private final ChatMessageService chatMessageService;
+    private final ChatRoomService chatRoomService;
     private final ObjectMapper mapper;
     // 현재 연결된 웹소켓 세션들을 담는 Set
     private final Set<WebSocketSession> sessions = new HashSet<>();
@@ -35,12 +38,20 @@ public class WebSoketChatHandler extends TextWebSocketHandler {
         log.info("{} 연결됨", session.getId());
         sessions.add(session);
 
-        // 사용자 정보 확인
-        Map<String, Object> claims = (Map<String, Object>) session.getAttributes().get("claims");
-        if (claims != null) {
-            log.info("User {} connected", claims.get("email"));
+        Long chatRoomId = getChatRoomId(session);
+        if (chatRoomId != null) {
+            chatRoomService.addSessionToChatRoom(chatRoomId, session);
+            chatRoomSessionMap.computeIfAbsent(chatRoomId, s -> new HashSet<>()).add(session);
+
+            // 사용자 정보 확인
+            Map<String, Object> claims = (Map<String, Object>) session.getAttributes().get("claims");
+            if (claims != null) {
+                log.info("User {} connected", claims.get("email"));
+            } else {
+                log.error("사용자 정보를 찾을 수 없습니다.");
+                session.close(CloseStatus.NOT_ACCEPTABLE);
+            }
         } else {
-            log.error("사용자 정보를 찾을 수 없습니다.");
             session.close(CloseStatus.NOT_ACCEPTABLE);
         }
     }
@@ -74,7 +85,8 @@ public class WebSoketChatHandler extends TextWebSocketHandler {
         removeClosedSessions(chatRoomSessionMap.get(chatRoomId));
         // 채팅방에 메시지 전송
         sendMessageToChatRoom(chatMessageDTO, chatRoomSessionMap.get(chatRoomId));
-
+        // 메시지 저장
+        chatMessageService.saveMessage(chatMessageDTO);
     }
 
     // 소켓 종료 확인
@@ -82,8 +94,16 @@ public class WebSoketChatHandler extends TextWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         log.info("{} 연결 끊김", session.getId());
         sessions.remove(session);
-        chatRoomSessionMap.values().forEach(sessions -> sessions.remove(session));
+        Long chatRoomId = getChatRoomId(session);
+        chatRoomService.removeSessionFromChatRoom(chatRoomId, session);
+        chatRoomSessionMap.getOrDefault(chatRoomId, new HashSet<>()).remove(session);
     }
+    private Long getChatRoomId(WebSocketSession session) {
+        String uri = session.getUri().toString();
+        String[] segments = uri.split("/");
+        return segments.length > 2 ? Long.valueOf(segments[2]) : null;
+    }
+
 
     // ====== 채팅 관련 메소드 ======
 

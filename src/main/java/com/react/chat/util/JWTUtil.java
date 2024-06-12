@@ -3,7 +3,7 @@ package com.react.chat.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.jackson.io.JacksonSerializer;
+//import io.jsonwebtoken.jackson.io.JacksonSerializer;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -44,7 +44,7 @@ public class JWTUtil {
                 .setClaims(valueMap) // 페이로드(Claim)에 추가할 (사용자관련)데이터
                 .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
                 .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(min).toInstant()))
-                .serializeToJsonWith(new JacksonSerializer<>(objectMapper)) // JacksonSerializer 사용
+//                .serializeToJsonWith(new JacksonSerializer<>(objectMapper)) // JacksonSerializer 사용
                 .signWith(secretKey) // 비밀키로 서명
                 .compact();// 토큰 생성 -> 문자열 리턴
         log.info("jwtStr : {}", jwtStr);

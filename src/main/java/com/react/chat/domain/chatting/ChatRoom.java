@@ -4,8 +4,8 @@ import com.react.chat.domain.baseEntity.BaseEntityCreatedDate;
 import com.react.chat.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.web.socket.WebSocketSession;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,11 +30,20 @@ public class ChatRoom extends BaseEntityCreatedDate {
     @Builder.Default
     private Set<Member> members = new HashSet<>();
 
-    @Setter
-    private String lastMessage;
-    @Setter
-    private LocalDateTime lastMessageTime;
+    // 세션 조회
+    @Getter
+    @Transient // 데이터베이스에 저장되지 않도록 Transient 어노테이션 사용
+    private Set<WebSocketSession> sessions = new HashSet<>();
 
-    // 필드 수정 메서드 추가
+    // 세션 추가
+    public void addSession(WebSocketSession session) {
+        sessions.add(session);
+    }
+
+    // 세션 제거
+    public void removeSession(WebSocketSession session) {
+        sessions.remove(session);
+    }
+
 }
 

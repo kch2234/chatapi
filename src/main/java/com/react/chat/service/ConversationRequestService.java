@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,8 +59,7 @@ public class ConversationRequestService {
         conversationRequestRepository.save(conversationRequest);
 
         ChatRoom chatRoom = ChatRoom.builder()
-                .sender(conversationRequest.getSender())
-                .receiver(conversationRequest.getReceiver())
+                .members(Set.of(conversationRequest.getSender(), conversationRequest.getReceiver()))
                 .build();
 
         ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);

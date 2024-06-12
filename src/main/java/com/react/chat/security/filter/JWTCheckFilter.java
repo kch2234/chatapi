@@ -35,8 +35,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     String requestURI = request.getRequestURI();
     log.info("***** JWTCheckFilter - shouldNotFilter : requestURI : {}", requestURI);
     // 필터 체크 안 하는 경로
-      //return requestURI.startsWith("/api/member/login") || requestURI.startsWith("/chat") || requestURI.startsWith("/match");
-    if(requestURI.startsWith("/signup")) {
+    if(requestURI.startsWith("/signup") || requestURI.startsWith("/api/member/login") || requestURI.startsWith("/chat") || requestURI.startsWith("/match")) {
       return true;
     }
     // 추후 이미지 경로로 수정
@@ -54,55 +53,55 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     String authValue = request.getHeader("Authorization");
     log.info("***** doFilterInternal - authValue : {}", authValue);
 
-      if (authValue != null && authValue.startsWith("Bearer ")) {
-          String token = authValue.substring(7);
-          log.info("JWTCheckFilter - token: {}", token);
-          //try {
-          //        if (JWTUtil.isValidToken(token)) {
-          //          String username = JWTUtil.getUsernameFromToken(token);
-          //          log.info("***** doFilterInternal - accessToken : {}", token);
-    try {
-      String accessToken = authValue.substring(7);
-      Map<String, Object> claims = JWTUtil.validateToken(accessToken);
-      log.info("********* doFilterInternal - claims : {}", claims);
+    if (authValue != null && authValue.startsWith("Bearer ")) {
+      String token = authValue.substring(7);
+      log.info("JWTCheckFilter - token: {}", token);
+      //try {
+      try {
+              if (JWTUtil.isValidToken(token)) {
+                String username = JWTUtil.getUsernameFromToken(token);
+                log.info("***** doFilterInternal - accessToken : {}", token);
+        String accessToken = authValue.substring(7);
+        Map<String, Object> claims = JWTUtil.validateToken(accessToken);
+        log.info("********* doFilterInternal - claims : {}", claims);
 
-      // 인증 정보 claims로 MemberDTO 구성 -> 시큐리티에 반영 추가 (시큐리티용 권한)
-      Long id = (Long) claims.get("id");
-      String email = (String) claims.get("email");
-      String password = (String) claims.get("password");
-      Role role = (Role) claims.get("role");
+        // 인증 정보 claims로 MemberDTO 구성 -> 시큐리티에 반영 추가 (시큐리티용 권한)
+        Long id = (Long) claims.get("id");
+        String email = (String) claims.get("email");
+        String password = (String) claims.get("password");
+        Role role = (Role) claims.get("role");
 
-      MemberDTO memberDTO = new MemberDTO(id, email, password, role);
+        MemberDTO memberDTO = new MemberDTO(id, email, password, role);
         log.info("******** doFilterInternal - memberDTO : {}", memberDTO);
 
-      // 시큐리티 인증 추가 JWT <-> SpringSecurity 로그인 상태 호환
-      UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO, password, memberDTO.getAuthorities());
-      SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-      //} else {
-        //log.error("Invalid JWT token");
-      filterChain.doFilter(request, response);
-      //response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        //          return;
-        //        }
+        // 시큐리티 인증 추가 JWT <-> SpringSecurity 로그인 상태 호환
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO, password, memberDTO.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        } else {
+        log.error("Invalid JWT token");
+        filterChain.doFilter(request, response);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                  return;
+                }
 
-    }catch (Exception e) {
-      log.error("***** JWTCheckFilter error!!!");
-      log.error(e.getMessage());
-      //response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      } catch (Exception e) {
+        log.error("***** JWTCheckFilter error!!!");
+        log.error(e.getMessage());
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-      Gson gson = new Gson();
-      String msg = gson.toJson(Map.of("error", "ERROR_ACCESS_TOKEN"));
-      response.setContentType("application/json");
-      PrintWriter writer = response.getWriter();
-      writer.println(msg);
-      writer.close();
-      //return; // 오류가 발생한 경우 요청 처리를 중단합니다.
+        Gson gson = new Gson();
+        String msg = gson.toJson(Map.of("error", "ERROR_ACCESS_TOKEN"));
+        response.setContentType("application/json");
+        PrintWriter writer = response.getWriter();
+        writer.println(msg);
+        writer.close();
+        return;
+      }
+
+    filterChain.doFilter(request, response); // 필터 체인을 통해 요청을 계속 진행합니다.
     }
 
-//    filterChain.doFilter(request, response); // 필터 체인을 통해 요청을 계속 진행합니다.
-  }
-
-  // 리스트를 LocalDateTime으로 변환하는 메서드 추가
+    // 리스트를 LocalDateTime으로 변환하는 메서드 추가
   /*private LocalDateTime convertToLocalDateTime(List<?> dateList) {
     return LocalDateTime.of(
             ((Number) dateList.get(0)).intValue(),

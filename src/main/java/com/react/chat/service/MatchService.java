@@ -1,6 +1,7 @@
 package com.react.chat.service;
 
 import com.react.chat.domain.chatting.ChatRoom;
+import com.react.chat.domain.member.Interest;
 import com.react.chat.domain.member.Member;
 import com.react.chat.dto.ChatRoomDTO;
 import com.react.chat.repository.ChatRoomRepository;
@@ -23,22 +24,20 @@ public class MatchService {
 
     // 매칭된 사용자 찾기
     public Optional<ChatRoomDTO> findMatch(Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
+        return Optional.empty();
+    }
 
-        List<Member> potentialMatches = memberRepository.findByMatching(
-                /*member.getInterest(),*/null, member.getGender(), member.getNationality());
+    // 채팅방 생성
+    public ChatRoomDTO createChatRoom(Long senderId, Long recipientId) {
+        Member sender = memberRepository.findById(senderId).orElseThrow(() -> new IllegalArgumentException("Invalid sender ID"));
+        Member recipient = memberRepository.findById(recipientId).orElseThrow(() -> new IllegalArgumentException("Invalid recipient ID"));
 
-        if (potentialMatches.isEmpty()) {
-            return Optional.empty();
-        }
-
-        Member match = potentialMatches.get(0);  // 첫 번째 일치하는 사용자를 선택
         ChatRoom chatRoom = ChatRoom.builder()
-                .name(member.getNickname() + " & " + match.getNickname() + "'s Chat Room")
-                .members(new HashSet<>(List.of(member, match)))
+                .name(sender.getNickname() + " & " + recipient.getNickname() + "'s Chat Room")
+                .members(new HashSet<>(List.of(sender, recipient)))
                 .build();
 
         ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
-        return Optional.of(modelMapper.map(savedChatRoom, ChatRoomDTO.class));
+        return modelMapper.map(savedChatRoom, ChatRoomDTO.class);
     }
 }

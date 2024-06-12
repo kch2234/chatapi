@@ -2,6 +2,7 @@ package com.react.chat.service;
 
 import com.react.chat.domain.chatting.ChatMessage;
 import com.react.chat.domain.chatting.ChatRoom;
+import com.react.chat.domain.enumFiles.MessageType;
 import com.react.chat.domain.member.Member;
 import com.react.chat.dto.ChatMessageDTO;
 import com.react.chat.dto.ChatRoomDTO;
@@ -43,6 +44,34 @@ public class ChatMessageService {
         }
     }
 
+    // 메시지 저장
+    public ChatMessageDTO saveMessage(ChatMessageDTO messageDTO) {
+        Optional<Member> findMember = memberRepository.findById(messageDTO.getSender().getId());
+        Optional<ChatRoom> findRoom = chatRoomRepository.findById(messageDTO.getChatRoom().getId());
+        if (findMember.isPresent() && findRoom.isPresent()) {
+            Member sender = findMember.get();
+            ChatMessage message = modelMapper.map(messageDTO, ChatMessage.class);
+            message.setSender(sender);
+            message.setChatRoom(findRoom.get());
+            message.setTimestamp(LocalDateTime.now());
+            message.setMessageType(MessageType.MESSAGE);
+            ChatMessage savedMessage = chatMessageRepository.save(message);
+            return modelMapper.map(savedMessage, ChatMessageDTO.class);
+        } else {
+            throw new IllegalArgumentException("존재하지 않는 회원이거나 채팅방입니다.");
+        }
+    }
+
+    // 채팅방 목록 조회
+    public List<ChatMessageDTO> getChatRooms(Member member) {
+        Member findMember = memberRepository.findById(member.getId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+        List<ChatMessage> chatRooms = chatMessageRepository.findChatRoomsByMember(findMember);
+        return chatRooms.stream()
+                .map(message -> modelMapper.map(message, ChatMessageDTO.class))
+                .collect(Collectors.toList());
+    }
+
+
     // 메시지 전송
     @Transactional
     public ChatMessageDTO sendMessage(ChatMessageDTO messageDTO) {
@@ -54,16 +83,17 @@ public class ChatMessageService {
             message.setSender(sender);
             message.setChatRoom(findRoom.get());
             message.setTimestamp(LocalDateTime.now());
-            message.setMessageType(ChatMessage.MessageType.MESSAGE);
+            message.setMessageType(MessageType.MESSAGE);
             chatMessageRepository.save(message);
             ChatMessageDTO savedMessageDTO = modelMapper.map(message, ChatMessageDTO.class);
             template.convertAndSend("/sub/chat/room/" + messageDTO.getChatRoom().getId(), savedMessageDTO);
-            chatRoomRepository.updateLastMessage(message.getChatRoom().getId(), message.getTimestamp(), message.getContent());
             return savedMessageDTO;
         } else {
             throw new IllegalArgumentException("존재하지 않는 회원이거나 채팅방입니다.");
         }
     }
+
+
 
     @Transactional
     public ChatMessageDTO addUser(ChatMessageDTO messageDTO) {
@@ -76,11 +106,10 @@ public class ChatMessageService {
             message.setSender(sender);
             message.setChatRoom(findRoom.get());
             message.setTimestamp(LocalDateTime.now());
-            message.setMessageType(ChatMessage.MessageType.ENTER);
+            message.setMessageType(MessageType.ENTER);
             chatMessageRepository.save(message);
             ChatMessageDTO savedMessageDTO = modelMapper.map(message, ChatMessageDTO.class);
             template.convertAndSend("/sub/chat/room/" + messageDTO.getChatRoom().getId(), savedMessageDTO);
-            chatRoomRepository.updateLastMessage(message.getChatRoom().getId(), message.getTimestamp(), message.getContent());
             return savedMessageDTO;
         } else {
             throw new IllegalArgumentException("존재하지 않는 회원이거나 채팅방입니다.");
@@ -98,11 +127,10 @@ public class ChatMessageService {
             message.setSender(sender);
             message.setChatRoom(findRoom.get());
             message.setTimestamp(LocalDateTime.now());
-            message.setMessageType(ChatMessage.MessageType.LEAVE);
+            message.setMessageType(MessageType.LEAVE);
             chatMessageRepository.save(message);
             ChatMessageDTO savedMessageDTO = modelMapper.map(message, ChatMessageDTO.class);
             template.convertAndSend("/sub/chat/room/" + messageDTO.getChatRoom().getId(), savedMessageDTO);
-            chatRoomRepository.updateLastMessage(message.getChatRoom().getId(), message.getTimestamp(), message.getContent());
             return savedMessageDTO;
         } else {
             throw new IllegalArgumentException("존재하지 않는 회원이거나 채팅방입니다.");
