@@ -2,57 +2,29 @@ package com.react.chat.dto;
 
 import com.react.chat.domain.enumFiles.Gender;
 import com.react.chat.domain.enumFiles.Role;
-import com.react.chat.domain.member.Member;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@Setter
 public class MemberDTO extends User {
   private Long id;
   private String email;
-  private String nickname;
   private String password;
-  private List<ProfileImageDTO> profileImageDTO = new ArrayList<>();
-  private String phone;
-  private String introduction;
-  private LocalDateTime birth;
-  private boolean disabled;
-  private LocalDateTime disabledDate;
-  private String nationality;
-  private Gender gender;
   private Role role;
-  private LocalDateTime createDate;
-  private LocalDateTime updateDate;
-
 
   // 생성자 Entity -> DTO
-  public MemberDTO (Long id, String email, String nickname, String password, List<ProfileImageDTO> profileImageDTO,
-                    String phone, String introduction, LocalDateTime birth,
-                    boolean disabled, LocalDateTime disabledDate,
-                    String nationality, Gender gender, Role role,
-                    LocalDateTime createDate, LocalDateTime updateDate) {
+  public MemberDTO (Long id, String email, String password, Role role) {
     super(email, password, Collections.singletonList(new SimpleGrantedAuthority(role.name())));
 
     this.id = id;
     this.email = email;
-    this.nickname = nickname;
     this.password = password;
-    this.profileImageDTO = profileImageDTO;
-    this.phone = phone;
-    this.introduction = introduction;
-    this.birth = birth;
-    this.nationality = nationality;
-    this.gender = gender;
     this.role = role;
-    this.disabled = disabled;
-    this.disabledDate = disabledDate;
-    this.createDate = createDate;
-    this.updateDate = updateDate;
   }
 
   // 현재 사용자 정보를 Map 타입으로 리턴 : JWT 를 위한 메서드 -> 추후 JWT 문자열 생성시 사용
@@ -61,19 +33,8 @@ public class MemberDTO extends User {
     Map<String, Object> map = new HashMap<>();
     map.put("id", id);
     map.put("email", email);
-    map.put("profileImageDTO", profileImageDTO); // List<ProfileImageDTO> 타입
-    map.put("phone", phone);
-    map.put("nickname", nickname);
-    map.put("introduction", introduction);
-    map.put("birth", birth.toString());
-    map.put("nationality", nationality);
-    map.put("gender", gender);
+    map.put("password", password);
     map.put("role", role);
-    map.put("disabled", disabled);
-    map.put("disabledDate", disabledDate);
-    map.put("createDate", createDate);
-    map.put("updateDate", updateDate);
-
     return map;
   }
 

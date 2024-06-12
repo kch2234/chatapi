@@ -21,6 +21,6 @@ public class UserLanguage extends BaseEntityCreatedDate {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private UserLanguages language;
+    private UserLanguages userLanguages;
 
 }

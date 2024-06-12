@@ -38,11 +38,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     List<ProfileImageDTO> profileImageDTOList = new ArrayList<>();  // 프로필 이미지 리스트
 
-    MemberDTO memberDTO = new MemberDTO(member.getId(), member.getEmail(), member.getNickname(), member.getPassword(), profileImageDTOList,
-        member.getPhone(), member.getIntroduction(), member.getBirth(),
-        member.isDisabled(), member.getDisabledDate(),
-        member.getNationality(), member.getGender(), member.getRole(),
-        member.getCreateDate(), member.getUpdateDate());
+    MemberDTO memberDTO = new MemberDTO(member.getId(), member.getEmail(), member.getPassword(), member.getRole()
+        );
 
 
       log.info("***** CustomUserDetailsService/loadUserByUsername - memberDTO : {}", memberDTO);
