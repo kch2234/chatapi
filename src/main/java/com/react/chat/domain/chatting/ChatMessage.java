@@ -3,6 +3,7 @@ package com.react.chat.domain.chatting;
 import com.react.chat.domain.baseEntity.BaseEntityCreatedDate;
 import com.react.chat.domain.enumFiles.MessageType;
 import com.react.chat.domain.member.Member;
+import com.react.chat.dto.ChatMessageDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,4 +36,15 @@ public class ChatMessage extends BaseEntityCreatedDate {
 
     @Column(nullable = false)
     private LocalDateTime timestamp;
+
+    public ChatMessageDTO toDTO() {
+        return ChatMessageDTO.builder()
+                .id(id)
+                .MessageType(messageType)
+                .content(content)
+                .sender(sender)
+                .ChatRoom(chatRoom)
+                .timestamp(timestamp)
+                .build();
+    }
 }

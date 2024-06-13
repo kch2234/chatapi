@@ -45,5 +45,8 @@ public class ChatRoom extends BaseEntityCreatedDate {
         sessions.remove(session);
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 }
 

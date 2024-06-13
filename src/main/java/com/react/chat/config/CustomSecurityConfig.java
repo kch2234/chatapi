@@ -57,9 +57,10 @@ public class CustomSecurityConfig {
       login.failureHandler(new CustomLoginFailureHandler());
     });
 
-    // 웹소켓 허용 경로 추가
+    // 권한 설정
     http.authorizeHttpRequests(authorize -> authorize
             .requestMatchers("/api/member/login").permitAll() // 로그인 경로 허용
+            .requestMatchers("/api/chat/**").permitAll()
             .requestMatchers("/chat/**").permitAll() // 웹소켓 엔드포인트 허용
             .requestMatchers("/match/**").permitAll()
             .anyRequest().authenticated()
@@ -84,8 +85,8 @@ public class CustomSecurityConfig {
     configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE"));
     configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
     configuration.setAllowCredentials(true);
-//    configuration.setMaxAge(3600L);
-//    configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+    configuration.setMaxAge(3600L);
+    configuration.setExposedHeaders(Collections.singletonList("Authorization"));
 
     // 위 설정정보를 토대로 Url 전체 경로에 적용하는 CORS 설정 소스 생성해 리턴
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -42,7 +42,7 @@ public class ChatRoomService {
     }
 
     // 모든 채팅방 조회
-    public List<ChatRoomDTO> getAllChatRooms(MemberDTO member) {
+    public List<ChatRoomDTO> getAllChatRooms() {
         List<ChatRoom> chatRooms = chatRoomRepository.findAll();
         return chatRooms.stream()
                 .map(chatRoom -> modelMapper.map(chatRoom, ChatRoomDTO.class))

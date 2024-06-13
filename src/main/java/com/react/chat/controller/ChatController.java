@@ -36,10 +36,11 @@ public class ChatController {
     }
 
     // 로그인 사용자 채팅방 목록 조회
-    @GetMapping("/rooms")
-    public List<ChatRoomDTO> getChatRooms(@AuthenticationPrincipal MemberDTO member) {
-        log.info("******** ChatController GET /rooms - member : {}", member);
-        List<ChatRoomDTO> chatRooms = chatRoomService.getAllChatRooms(member);
+    @GetMapping("/list")
+    public List<ChatRoomDTO> list() {
+        log.info("******** ChatController GET /rooms");
+        List<ChatRoomDTO> chatRooms = chatRoomService.getAllChatRooms();
+        log.info("******** ChatController GET /rooms - chatRooms : {}", chatRooms);
         return chatRooms;
     }
 
@@ -47,7 +48,6 @@ public class ChatController {
     @PostMapping("/create")
     public Map<String, Long> createChatRoom(@RequestBody ChatRoomDTO chatRoomDTO) {
         log.info("******** ChatController POST /create - chatRoomDTO : {}", chatRoomDTO);
-
         Long room = chatRoomService.createChatRoom(chatRoomDTO);
         return Map.of("room", room);
     }

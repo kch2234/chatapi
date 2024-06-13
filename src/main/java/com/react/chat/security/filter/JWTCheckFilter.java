@@ -35,7 +35,11 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     String requestURI = request.getRequestURI();
     log.info("***** JWTCheckFilter - shouldNotFilter : requestURI : {}", requestURI);
     // 필터 체크 안 하는 경로
-    if(requestURI.startsWith("/signup") || requestURI.startsWith("/api/member/login") || requestURI.startsWith("/chat") || requestURI.startsWith("/match")) {
+    if(requestURI.startsWith("/signup")
+            || requestURI.startsWith("/api/member/login")
+            || requestURI.startsWith("/api/chat/**")
+            || requestURI.startsWith("/chat")
+            || requestURI.startsWith("/match")) {
       return true;
     }
     // 추후 이미지 경로로 수정
@@ -58,18 +62,20 @@ public class JWTCheckFilter extends OncePerRequestFilter {
       log.info("JWTCheckFilter - token: {}", token);
       //try {
       try {
-              if (JWTUtil.isValidToken(token)) {
-                String username = JWTUtil.getUsernameFromToken(token);
-                log.info("***** doFilterInternal - accessToken : {}", token);
+        if (JWTUtil.isValidToken(token)) {
+        String username = JWTUtil.getUsernameFromToken(token);
+        log.info("***** doFilterInternal - accessToken : {}", token);
         String accessToken = authValue.substring(7);
         Map<String, Object> claims = JWTUtil.validateToken(accessToken);
         log.info("********* doFilterInternal - claims : {}", claims);
 
         // 인증 정보 claims로 MemberDTO 구성 -> 시큐리티에 반영 추가 (시큐리티용 권한)
-        Long id = (Long) claims.get("id");
+        Number idNumber = (Number) claims.get("id");
+        Long id = idNumber.longValue();
         String email = (String) claims.get("email");
         String password = (String) claims.get("password");
-        Role role = (Role) claims.get("role");
+          String roleString = (String) claims.get("role");
+          Role role = Role.valueOf(roleString);
 
         MemberDTO memberDTO = new MemberDTO(id, email, password, role);
         log.info("******** doFilterInternal - memberDTO : {}", memberDTO);
@@ -79,11 +85,10 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         } else {
         log.error("Invalid JWT token");
-        filterChain.doFilter(request, response);
+//        filterChain.doFilter(request, response);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                  return;
-                }
-
+        return;
+        }
       } catch (Exception e) {
         log.error("***** JWTCheckFilter error!!!");
         log.error(e.getMessage());
@@ -97,21 +102,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         writer.close();
         return;
       }
-
-    filterChain.doFilter(request, response); // 필터 체인을 통해 요청을 계속 진행합니다.
+      filterChain.doFilter(request, response);
     }
-
-    // 리스트를 LocalDateTime으로 변환하는 메서드 추가
-  /*private LocalDateTime convertToLocalDateTime(List<?> dateList) {
-    return LocalDateTime.of(
-            ((Number) dateList.get(0)).intValue(),
-            ((Number) dateList.get(1)).intValue(),
-            ((Number) dateList.get(2)).intValue(),
-            ((Number) dateList.get(3)).intValue(),
-            ((Number) dateList.get(4)).intValue(),
-            ((Number) dateList.get(5)).intValue(),
-            ((Number) dateList.get(6)).intValue()
-    );
-  }*/
   }
 }

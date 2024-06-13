@@ -46,4 +46,11 @@ class ChatMessageRepositoryTest {
     }
 
     // 채팅방 id로 메시지 목록 조회
+    @Test
+    public void testFindByChatRoomId() {
+        List<ChatMessage> chatMessages = chatMessageRepository.findChatRoomsByMember(Member.builder().id(1L).build());
+        for (ChatMessage chatMessage : chatMessages) {
+            log.info("chatMessage : {}", chatMessage);
+        }
+    }
 }
