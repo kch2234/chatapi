@@ -35,11 +35,13 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     String requestURI = request.getRequestURI();
     log.info("***** JWTCheckFilter - shouldNotFilter : requestURI : {}", requestURI);
     // 필터 체크 안 하는 경로
-    if(requestURI.startsWith("/signup")
-            || requestURI.startsWith("/api/member/login")
-            || requestURI.startsWith("/api/chat/**")
-            || requestURI.startsWith("/chat")
-            || requestURI.startsWith("/match")) {
+    if(requestURI.startsWith("/signup")) {
+      return true;
+    }
+    if(requestURI.startsWith("/login")) {
+      return true;
+    }
+    if(requestURI.startsWith("/api/member")) {
       return true;
     }
     // 추후 이미지 경로로 수정
@@ -69,40 +71,28 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         Map<String, Object> claims = JWTUtil.validateToken(accessToken);
         log.info("********* doFilterInternal - claims : {}", claims);
 
-        // 인증 정보 claims로 MemberDTO 구성 -> 시큐리티에 반영 추가 (시큐리티용 권한)
-        Number idNumber = (Number) claims.get("id");
-        Long id = idNumber.longValue();
-        String email = (String) claims.get("email");
-        String password = (String) claims.get("password");
-          String roleString = (String) claims.get("role");
-          Role role = Role.valueOf(roleString);
+      // * 인증 정보 claims로 MemberDTO 구성 -> 시큐리티에 반영 추가 (시큐리티용 권한)
+      Long id = (Long)  claims.get("id");
+      String email = (String) claims.get("email");
+      String password = (String) claims.get("password");
+      Role role = (Role) claims.get("role");
+      MemberDTO memberDTO = new MemberDTO(id, email, password, role);
+      log.info("******** doFilterInternal - memberDTO : {}", memberDTO);
 
-        MemberDTO memberDTO = new MemberDTO(id, email, password, role);
-        log.info("******** doFilterInternal - memberDTO : {}", memberDTO);
+      // * 시큐리티 인증 추가 : JWT와 SpringSecurity 로그인상태 호환되도록 처리
+      UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO, password, memberDTO.getAuthorities());
+      SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+      filterChain.doFilter(request, response); // 다음필터 이동해라~
 
-        // 시큐리티 인증 추가 JWT <-> SpringSecurity 로그인 상태 호환
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO, password, memberDTO.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        } else {
-        log.error("Invalid JWT token");
-//        filterChain.doFilter(request, response);
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        return;
-        }
-      } catch (Exception e) {
-        log.error("***** JWTCheckFilter error!!!");
-        log.error(e.getMessage());
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-
-        Gson gson = new Gson();
-        String msg = gson.toJson(Map.of("error", "ERROR_ACCESS_TOKEN"));
-        response.setContentType("application/json");
-        PrintWriter writer = response.getWriter();
-        writer.println(msg);
-        writer.close();
-        return;
-      }
-      filterChain.doFilter(request, response);
+    }catch (Exception e) {
+      log.error("*********** JWTCheckFilter error!!!");
+      log.error(e.getMessage());
+      Gson gson = new Gson();
+      String msg = gson.toJson(Map.of("error", "ERROR_ACCESS_TOKEN"));
+      response.setContentType("application/json");
+      PrintWriter writer = response.getWriter();
+      writer.println(msg);
+      writer.close();
     }
   }
 }

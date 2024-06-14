@@ -50,7 +50,7 @@ public class CustomSecurityConfig {
     http.csrf(csrf -> csrf.disable());
 
     http.formLogin(login -> {
-      login.loginPage("/api/member/login"); // 로그인 경로
+      login.loginPage("/login"); // 로그인 경로
       // 로그인 성공시 실행될 로직 클래스
       login.successHandler(new CustomLoginSuccessHandler(gson));
       // 로그인 실패시 실행될 로직 클래스
@@ -94,6 +94,7 @@ public class CustomSecurityConfig {
 
     return source;
   }
+
 
   @Bean
   public PasswordEncoder passwordEncoder() {

@@ -1,24 +1,25 @@
 package com.react.chat.repository;
 
-import com.react.chat.domain.enumFiles.Gender;
-import com.react.chat.domain.member.Interest;
 import com.react.chat.domain.member.Member;
-import com.react.chat.domain.member.ProfileImage;
-import com.react.chat.dto.ProfileImageDTO;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
-public interface MemberRepository extends JpaRepository<Member, String> {
+@Repository
+public interface MemberRepository extends JpaRepository<Member, Long> {
 
   @Query("select m from Member m where m.email = :email")
   Member getMemberByEmail(@Param("email") String email);
+    Optional<Member> findById(Long id);
 
-  Optional<Member> findById(Long id);
+//  Optional<Member> findByEmail(String email);
 
-//  List<Member> findByMatching(Interest interest, Gender gender, String nationality);
+  @Query("SELECT CASE WHEN COUNT(m) > 0 THEN TRUE ELSE FALSE END FROM Member m WHERE m.email = :email")
+  boolean existsByEmail(@Param("email") String email);
+
+  @Query("SELECT CASE WHEN COUNT(m) > 0 THEN TRUE ELSE FALSE END FROM Member m WHERE m.nickname = :nickname")
+  boolean existsByNickname(@Param("nickname") String nickname);
 }
