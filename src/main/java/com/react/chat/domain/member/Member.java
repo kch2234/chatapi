@@ -1,12 +1,15 @@
 package com.react.chat.domain.member;
 
 import com.react.chat.domain.baseEntity.BaseEntityUpdatedDate;
+import com.react.chat.domain.chatting.ChatRoom;
+import com.react.chat.domain.chatting.ConversationRequest;
 import com.react.chat.domain.enumFiles.Gender;
 import com.react.chat.domain.enumFiles.Role;
 import com.react.chat.domain.enumFiles.UserLanguages;
 import com.react.chat.dto.MemberDTO;
 import com.react.chat.dto.ProfileImageDTO;
 import jakarta.persistence.*;
+import lombok.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,10 +21,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.text.DateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Entity
 @Getter
@@ -74,14 +74,21 @@ public class Member extends BaseEntityUpdatedDate {
     private boolean disabled = false; // 탈퇴 여부 기본값 false : 탈퇴시 true
     private LocalDateTime disabledDate; // 탈퇴 날짜 : 30일 후 DB 삭제
 
-/*    @ManyToMany
-    @JoinTable(
-            name = "chatroom_members",
-            joinColumns = @JoinColumn(name = "member_id"),
-            inverseJoinColumns = @JoinColumn(name = "chatroom_id")
-    )
-    private Set<ChatRoom> chatRooms = new HashSet<>();
-*/
+    @ManyToMany(mappedBy = "members")
+    @Builder.Default
+    private List<ChatRoom> chatRooms = new ArrayList<>(); // 채팅방
+
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ConversationRequest> sentRequests = new ArrayList<>(); // 보낸 대화 요청
+
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ConversationRequest> receivedRequests = new ArrayList<>(); // 받은 대화 요청
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Interest> interests = new ArrayList<>(); // 관심사
 
     // 필드 수정 메서드
     // 권한 추가

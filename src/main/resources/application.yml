@@ -25,6 +25,7 @@ logging:
     org.springframework.security.web: trace
 
 server:
+  port: 8080
   servlet:
     session:
       tracking-modes: cookie

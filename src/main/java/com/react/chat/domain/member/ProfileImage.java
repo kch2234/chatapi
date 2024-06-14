@@ -1,13 +1,11 @@
 package com.react.chat.domain.member;
 
-import com.react.chat.domain.baseEntity.BaseEntityCreatedDate;
 import jakarta.persistence.*;
 import lombok.*;
 
 //@Entity
 @Embeddable
 @Getter
-@Setter
 @ToString
 @Builder
 @AllArgsConstructor

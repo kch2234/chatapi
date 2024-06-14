@@ -1,7 +1,9 @@
 package com.react.chat.domain.chatting;
 
-import com.react.chat.domain.baseEntity.BaseEntityUpdatedDate;
+import com.react.chat.domain.baseEntity.BaseEntityCreatedDate;
+import com.react.chat.domain.enumFiles.MessageType;
 import com.react.chat.domain.member.Member;
+import com.react.chat.dto.ChatMessageDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,26 +11,40 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@ToString
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChatMessage extends BaseEntityUpdatedDate {
+public class ChatMessage extends BaseEntityCreatedDate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chatRoomId", nullable = false)
-    private ChatRoom chatRoom;
+    @Enumerated(EnumType.STRING)
+    private MessageType messageType;
+
+    @Column(nullable = false)
+    private String content;
 
     @ManyToOne
-    @JoinColumn(name = "senderId", nullable = false)
-    private Member member;
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member sender;
 
-    private String message;
+    @ManyToOne
+    @JoinColumn(name = "chatroom_id", nullable = false)
+    private ChatRoom chatRoom;
 
-    // 메시지 전송 시간
+    @Column(nullable = false)
     private LocalDateTime timestamp;
 
+    public ChatMessageDTO toDTO() {
+        return ChatMessageDTO.builder()
+                .id(id)
+                .MessageType(messageType)
+                .content(content)
+                .sender(sender)
+                .ChatRoom(chatRoom)
+                .timestamp(timestamp)
+                .build();
+    }
 }

@@ -1,27 +1,34 @@
 package com.react.chat.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Builder;
-import lombok.Data;
+import com.react.chat.domain.chatting.ChatMessage;
+import com.react.chat.domain.chatting.ChatRoom;
+import com.react.chat.domain.enumFiles.MessageType;
+import com.react.chat.domain.member.Member;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ChatMessageDTO {
     private Long id;
-    private Long chatRoom;
-    // TODO: senderId를 member로 변경
-    private Long senderId;
-    private String message;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private MessageType MessageType;
+    private String content;
+    private Member sender;
+    private ChatRoom ChatRoom;
     private LocalDateTime timestamp;
 
-    /*public ChatMessageDTO(Long id, Long chatRoomId, Long senderId, String message, LocalDateTime timestamp) {
-        this.id = id;
-        this.chatRoomId = chatRoomId;
-        this.senderId = senderId;
-        this.message = message;
-        this.timestamp = timestamp;
-    }*/
+    public ChatMessage toEntity() {
+        return ChatMessage.builder()
+                .id(id)
+                .messageType(MessageType)
+                .content(content)
+                .sender(sender)
+                .chatRoom(ChatRoom)
+                .timestamp(timestamp)
+                .build();
+    }
 }

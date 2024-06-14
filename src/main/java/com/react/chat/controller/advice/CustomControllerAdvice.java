@@ -25,6 +25,12 @@ public class CustomControllerAdvice {
     return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(Map.of("msg", msg));
   }
 
+  @ExceptionHandler(IllegalArgumentException.class)
+  protected ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException e) {
+    String msg = e.getMessage();
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("msg", msg));
+  }
+
   @ExceptionHandler(CustomJWTException.class)
   protected ResponseEntity<?> handleJWTException(CustomJWTException e) {
     String msg = e.getMessage();

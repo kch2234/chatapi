@@ -1,19 +1,15 @@
 package com.react.chat.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.List;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ChatRoomDTO {
     private Long id;
-    private String roomName;
-    // TODO : 테스트 후 String -> Member로 변경
-    private String member;
-    private String toMember;
-
-    private List<ChatMessageDTO> chatMessageList;
-
+    private String name;
 }
