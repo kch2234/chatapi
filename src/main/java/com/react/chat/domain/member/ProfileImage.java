@@ -19,6 +19,7 @@ public class ProfileImage {
     //@JoinColumn(name = "member_id", nullable = false)
     //private Member member;
     private String fileName;
+    @Setter
     private int ord;  // 이미지마다 번호 지정, 대표이미지 = 0 인것
 
 }

@@ -64,8 +64,8 @@ public class MemberServiceImpl implements MemberService {
   @Override
   public Boolean checkEmail(String email) {
 
-//    boolean result = memberRepository.findByEmail(email).isPresent();
-//    log.info("***** MemberServiceImpl checkEmail - findByEmail : {}", result);
+    //    boolean result = memberRepository.findByEmail(email).isPresent();
+    //    log.info("***** MemberServiceImpl checkEmail - findByEmail : {}", result);
 
     boolean result = memberRepository.existsByEmail(email);
     log.info("***** MemberServiceImpl checkEmail - existsByEmail : {}", result);

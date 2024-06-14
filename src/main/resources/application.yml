@@ -31,4 +31,4 @@ server:
       tracking-modes: cookie
 
 # 파일 업로드 경로
-chat.upload.path: upload
+chatapi.upload.path: upload
