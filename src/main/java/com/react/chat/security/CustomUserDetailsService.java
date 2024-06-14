@@ -41,9 +41,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     MemberDTO memberDTO = new MemberDTO(member.getId(), member.getEmail(), member.getPassword(), member.getRole());
 //    MemberDTO memberDTO = modelMapper.map(member, MemberDTO.class);
 
-      log.info("***** CustomUserDetailsService/loadUserByUsername - memberDTO : {}", memberDTO);
+    log.info("***** CustomUserDetailsService/loadUserByUsername - memberDTO : {}", memberDTO);
 
-      return memberDTO;
+    return memberDTO;
 //    return null;
 
   }

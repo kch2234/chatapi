@@ -28,7 +28,7 @@ public class ChatController {
     private final ChatMessageService chatMessageService;
 
     // 채팅방 id에 속한 메시지 목록 조회
-    @GetMapping("/{roomId}")
+    @GetMapping("/room/{roomId}")
     public List<ChatMessageDTO> getChatMessages(@PathVariable Long roomId) {
         log.info("******** ChatController GET /:roomId - roomId : {}", roomId);
         List<ChatMessageDTO> messages = chatMessageService.getMessagesByChatRoomId(roomId);
@@ -38,7 +38,6 @@ public class ChatController {
     // 로그인 사용자 채팅방 목록 조회
     @GetMapping("/list")
     public List<ChatRoomDTO> list() {
-        log.info("******** ChatController GET /rooms");
         List<ChatRoomDTO> chatRooms = chatRoomService.getAllChatRooms();
         log.info("******** ChatController GET /rooms - chatRooms : {}", chatRooms);
         return chatRooms;

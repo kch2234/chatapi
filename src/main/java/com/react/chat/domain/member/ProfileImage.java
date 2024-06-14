@@ -21,4 +21,7 @@ public class ProfileImage {
     private String fileName;
     private int ord;  // 이미지마다 번호 지정, 대표이미지 = 0 인것
 
+    public void setOrd(int size) {
+
+    }
 }

@@ -86,40 +86,40 @@ public class MemberServiceImpl implements MemberService {
   // Entity -> MemberFormDTO
   private MemberFormDTO entityToDTO(Member member) {
     MemberFormDTO memberFormDTO = MemberFormDTO.builder()
-        .id(member.getId())
-        .email(member.getEmail())
-        .nickname(member.getNickname())
-        .password(member.getPassword())
-        .phone(member.getPhone())
-        .introduction(member.getIntroduction())
-        .birth(member.getBirth())
-        .nationality(member.getNationality())
-        .languageList(member.getLanguageList().stream().map(Enum::toString) // Enum -> String
-            .collect(Collectors.toList()))
-        .gender(member.getGender())
-        .role(member.getRole())
-        .build();
+            .id(member.getId())
+            .email(member.getEmail())
+            .nickname(member.getNickname())
+            .password(member.getPassword())
+            .phone(member.getPhone())
+            .introduction(member.getIntroduction())
+            .birth(member.getBirth())
+            .nationality(member.getNationality())
+            .languageList(member.getLanguageList().stream().map(Enum::toString) // Enum -> String
+                    .collect(Collectors.toList()))
+            .gender(member.getGender())
+            .role(member.getRole())
+            .build();
     return memberFormDTO;
   }
 
   // MemberFormDTO -> Entity
   private Member dtoToEntity(MemberFormDTO memberFormDTO) {
     Member member = Member.builder()
-        .id(memberFormDTO.getId())
-        .email(memberFormDTO.getEmail())
-        .nickname(memberFormDTO.getNickname())
-        .password(memberFormDTO.getPassword())
-        .phone(memberFormDTO.getPhone())
-        .introduction(memberFormDTO.getIntroduction())
-        .birth(memberFormDTO.getBirth())
-        .nationality(memberFormDTO.getNationality())
-        /*        .languageList(memberFormDTO.getLanguageList()
-                    .stream()
-                    .map(UserLanguages::valueOf) // String -> Enum
-                    .collect(Collectors.toList()))*/
-        .gender(memberFormDTO.getGender())
-        .role(memberFormDTO.getRole())
-        .build();
+            .id(memberFormDTO.getId())
+            .email(memberFormDTO.getEmail())
+            .nickname(memberFormDTO.getNickname())
+            .password(memberFormDTO.getPassword())
+            .phone(memberFormDTO.getPhone())
+            .introduction(memberFormDTO.getIntroduction())
+            .birth(memberFormDTO.getBirth())
+            .nationality(memberFormDTO.getNationality())
+            /*        .languageList(memberFormDTO.getLanguageList()
+                        .stream()
+                        .map(UserLanguages::valueOf) // String -> Enum
+                        .collect(Collectors.toList()))*/
+            .gender(memberFormDTO.getGender())
+            .role(memberFormDTO.getRole())
+            .build();
     return member;
   }
 

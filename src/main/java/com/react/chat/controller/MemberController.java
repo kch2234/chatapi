@@ -40,7 +40,6 @@ public class MemberController {
   @PostMapping("/checkNickname")
   public ResponseEntity<Boolean> checkNickname(@RequestBody MemberFormDTO memberFormDTO) {
 
-    log.info("***** MemberController /checkEmail - memberFormDTO : {}", memberFormDTO);
     log.info("***** MemberController /checkEmail - nickname : {}", memberFormDTO.getNickname());
 
     String nickname = memberFormDTO.getNickname();

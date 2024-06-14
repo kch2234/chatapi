@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,8 @@ public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final MemberRepository memberRepository;
+
+    private final SimpMessageSendingOperations messagingTemplate;
     private final SimpMessagingTemplate template;
     private final ModelMapper modelMapper;
 
@@ -61,16 +64,6 @@ public class ChatMessageService {
             throw new IllegalArgumentException("존재하지 않는 회원이거나 채팅방입니다.");
         }
     }
-
-    // 채팅방 목록 조회
-    public List<ChatMessageDTO> getChatRooms(Member member) {
-        Member findMember = memberRepository.findById(member.getId()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
-        List<ChatMessage> chatRooms = chatMessageRepository.findChatRoomsByMember(findMember);
-        return chatRooms.stream()
-                .map(message -> modelMapper.map(message, ChatMessageDTO.class))
-                .collect(Collectors.toList());
-    }
-
 
     // 메시지 전송
     @Transactional
