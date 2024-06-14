@@ -5,10 +5,12 @@ import com.react.chat.domain.enumFiles.UserLanguages;
 import com.react.chat.domain.member.Member;
 import com.react.chat.dto.MemberFormDTO;
 import com.react.chat.repository.MemberRepository;
-//import com.react.chat.repository.UserLanguageRepository;
 import com.react.chat.util.FileUtilCustom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +26,9 @@ public class MemberServiceImpl implements MemberService {
 
   private final MemberRepository memberRepository;
   private final FileUtilCustom fileUtil;
+  private final PasswordEncoder encoder;
 
+  @Override
   public Long signup(MemberFormDTO memberFormDTO) {
     log.info("********** MemberServiceImpl signup - memberFormDTO : {}", memberFormDTO);
 
@@ -32,16 +36,18 @@ public class MemberServiceImpl implements MemberService {
     List<String> uploadFileNames = fileUtil.saveFiles(files);
     memberFormDTO.setUploadedFileNames(uploadFileNames);
 
-
     List<String> languageStrings = memberFormDTO.getLanguageList();
     log.info("********** MemberServiceImpl signup - languageStrings : {}", languageStrings);
     List<UserLanguages> languages = languageStrings.stream().map(UserLanguages::valueOf).collect(Collectors.toList());
     log.info("********** MemberServiceImpl signup - languages : {}", languages);
 
+    log.info("********** MemberServiceImpl signup - password : {}", memberFormDTO.getPassword());
     Member member = dtoToEntity(memberFormDTO);
 
     member.addUserLanguages(languages);
     member.addRole(Role.USER);
+    member.changePassword(encoder.encode(member.getPassword()));
+    log.info("********** MemberServiceImpl signup - encodedPassword : {}", member.getPassword());
 
     if (memberFormDTO.getUploadedFileNames() != null) {
       memberFormDTO.getUploadedFileNames().forEach(name -> {
@@ -55,10 +61,23 @@ public class MemberServiceImpl implements MemberService {
 
   }
 
+  @Override
   public Boolean checkEmail(String email) {
 
+//    boolean result = memberRepository.findByEmail(email).isPresent();
+//    log.info("***** MemberServiceImpl checkEmail - findByEmail : {}", result);
+
     boolean result = memberRepository.existsByEmail(email);
-    log.info("***** MemberServiceImpl checkEmail - checkId : {}", result);
+    log.info("***** MemberServiceImpl checkEmail - existsByEmail : {}", result);
+
+    return result;
+  }
+
+  @Override
+  public Boolean checkNickname(String nickname) {
+
+    boolean result = memberRepository.existsByNickname(nickname);
+    log.info("***** MemberServiceImpl checkNickname - checkNickname : {}", result);
 
     return result;
   }

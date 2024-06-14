@@ -6,4 +6,5 @@ import com.react.chat.dto.MemberFormDTO;
 public interface MemberService {
   Long signup(MemberFormDTO memberFormDTO);
   Boolean checkEmail(String email);
+  Boolean checkNickname(String nickname);
 }

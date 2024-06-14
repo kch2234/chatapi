@@ -39,13 +39,11 @@ public class CustomSecurityConfig {
     http.csrf(csrf -> csrf.disable());
 
     http.formLogin(login -> {
-      login.loginPage("/api/member/login"); // 로그인 경로
+      login.loginPage("/login"); // 로그인 경로
       // 로그인 성공시 실행될 로직 클래스
       login.successHandler(new CustomLoginSuccessHandler());
-      log.info("***** CustomSecurityConfig - SecurityFilterChain !loginSuccess");
       // 로그인 실패시 실행될 로직 클래스
       login.failureHandler(new CustomLoginFailureHandler());
-      log.info("***** CustomSecurityConfig - SecurityFilterChain !loginFailure");
     });
 
     http.addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -53,7 +51,6 @@ public class CustomSecurityConfig {
     // 접근 제한(허용X) 되었을 경우 예외 처리
     http.exceptionHandling(exception -> {
       exception.accessDeniedHandler(new CustomAccessDeniedHandler());
-      log.info("***** CustomSecurityConfig - SecurityFilterChain !accessDenied");
     });
 
     return http.build();

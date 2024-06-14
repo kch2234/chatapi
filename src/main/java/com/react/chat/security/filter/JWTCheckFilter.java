@@ -38,6 +38,12 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     if(requestURI.startsWith("/signup")) {
       return true;
     }
+    if(requestURI.startsWith("/login")) {
+      return true;
+    }
+    if(requestURI.startsWith("/api/member")) {
+      return true;
+    }
     // 추후 이미지 경로로 수정
 /*    if(requestURI.startsWith("")) {
       return true;
@@ -48,33 +54,32 @@ public class JWTCheckFilter extends OncePerRequestFilter {
   // 필터링 로직 작성 (추상메서드)
   @Override
   protected void doFilterInternal( HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-    log.info("***** JWTCheckFilter - doFilterInternal!");
 
+    log.info("************ JWTCheckFilter - doFilterInternal!");
     String authValue = request.getHeader("Authorization");
-    log.info("***** doFilterInternal - authValue : {}", authValue);
+    log.info("********* doFilterInternal - authValue : {}", authValue);
 
     try {
       String accessToken = authValue.substring(7);
       Map<String, Object> claims = JWTUtil.validateToken(accessToken);
       log.info("********* doFilterInternal - claims : {}", claims);
 
-      // 인증 정보 claims로 MemberDTO 구성 -> 시큐리티에 반영 추가 (시큐리티용 권한)
-      Long id = (Long) claims.get("id");
+      // * 인증 정보 claims로 MemberDTO 구성 -> 시큐리티에 반영 추가 (시큐리티용 권한)
+      Long id = (Long)  claims.get("id");
       String email = (String) claims.get("email");
       String password = (String) claims.get("password");
       Role role = (Role) claims.get("role");
-
       MemberDTO memberDTO = new MemberDTO(id, email, password, role);
+      log.info("******** doFilterInternal - memberDTO : {}", memberDTO);
 
-      // 시큐리티 인증 추가 JWT <-> SpringSecurity 로그인 상태 호환
+      // * 시큐리티 인증 추가 : JWT와 SpringSecurity 로그인상태 호환되도록 처리
       UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO, password, memberDTO.getAuthorities());
       SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-      filterChain.doFilter(request, response);
+      filterChain.doFilter(request, response); // 다음필터 이동해라~
 
     }catch (Exception e) {
-      log.error("***** JWTCheckFilter error!!!");
+      log.error("*********** JWTCheckFilter error!!!");
       log.error(e.getMessage());
-
       Gson gson = new Gson();
       String msg = gson.toJson(Map.of("error", "ERROR_ACCESS_TOKEN"));
       response.setContentType("application/json");

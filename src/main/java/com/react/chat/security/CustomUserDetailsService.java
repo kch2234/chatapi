@@ -30,23 +30,21 @@ public class CustomUserDetailsService implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     log.info("***** CustomUserDetailsService/loadUserByUsername - username : {}", username);
-
     Member member = memberRepository.getMemberByEmail(username);
+    log.info("***** CustomUserDetailsService/loadUserByUsername - username : {}", member.getEmail());
     if (member == null) { // 없는 사용자(email)일 경우 예외 발생
-      throw new UsernameNotFoundException("Email(username) Not Found");
+      throw new UsernameNotFoundException("****** CustomUserDetailsService - loadUserByUsername : Email(username) Not Found");
     }
 
-    List<ProfileImageDTO> profileImageDTOList = new ArrayList<>();  // 프로필 이미지 리스트
+//    List<ProfileImageDTO> profileImageDTOList = new ArrayList<>();  // 프로필 이미지 리스트
 
-    MemberDTO memberDTO = new MemberDTO(member.getId(), member.getEmail(), member.getPassword(), member.getRole()
-        );
-
+    MemberDTO memberDTO = new MemberDTO(member.getId(), member.getEmail(), member.getPassword(), member.getRole());
+//    MemberDTO memberDTO = modelMapper.map(member, MemberDTO.class);
 
       log.info("***** CustomUserDetailsService/loadUserByUsername - memberDTO : {}", memberDTO);
 
       return memberDTO;
-
-
+//    return null;
 
   }
 }
