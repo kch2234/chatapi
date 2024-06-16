@@ -13,8 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 @Slf4j
 @Transactional // EntityManager 사용위해
@@ -27,7 +25,7 @@ class ChatMessageRepositoryTest {
     // 메시지 등록
     @Test
     public void testInsert() {
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i <= 2; i++) {
             ChatMessage chatMessage = ChatMessage.builder()
                     .content("메시지" + i)
                     .chatRoom(ChatRoom.builder().id(1L).build())

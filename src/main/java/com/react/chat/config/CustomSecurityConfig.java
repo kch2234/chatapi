@@ -51,24 +51,20 @@ public class CustomSecurityConfig {
 
     http.formLogin(login -> {
       login.loginPage("/login"); // 로그인 경로
-      // 로그인 성공시 실행될 로직 클래스
       login.successHandler(new CustomLoginSuccessHandler(gson));
-      // 로그인 실패시 실행될 로직 클래스
       login.failureHandler(new CustomLoginFailureHandler());
     });
 
-    // 권한 설정
     http.authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/login").permitAll() // 로그인 경로 허용
+            .requestMatchers("/login").permitAll()
             .requestMatchers("/api/chat/**").permitAll()
-            .requestMatchers("/chat/**").permitAll() // 웹소켓 엔드포인트 허용
-            .requestMatchers("/match/**").permitAll()
+            .requestMatchers("/chat/**").permitAll()
+            .requestMatchers("/sockjs/**").permitAll()
             .anyRequest().authenticated()
     );
 
     http.addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class);
 
-    // 접근 제한(허용X) 되었을 경우 예외 처리
     http.exceptionHandling(exception -> {
       exception.accessDeniedHandler(new CustomAccessDeniedHandler());
       exception.authenticationEntryPoint(new JwtAuthenticationEntryPoint());
@@ -94,7 +90,6 @@ public class CustomSecurityConfig {
 
     return source;
   }
-
 
   @Bean
   public PasswordEncoder passwordEncoder() {

@@ -11,9 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-
-import static org.junit.jupiter.api.Assertions.*;
+import java.time.LocalDate;
 
 @SpringBootTest
 @Slf4j
@@ -34,7 +32,7 @@ class MemberRepositoryTest {
               .email("user" + i + "@test.com")
               .password(passwordEncoder.encode("1234"))
               .nickname("User" + i)
-              .birth(LocalDateTime.of(2024, 5, 31, 17, 23))
+              .birth(LocalDate.of(1990, 1, 1))
               .nationality("한국")
               .gender(Gender.MALE)
               .role(Role.USER)

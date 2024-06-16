@@ -14,8 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class MessageController {
 
     private final ChatMessageService chatMessageService;
+
     @MessageMapping("/chat/enter")
-    @SendTo("/sub/chat")
+    @SendTo("/sub/chat/room/{roomId}")
     public ChatMessageDTO enter(ChatMessageDTO messageDTO) {
         log.info("Received message - enter: {}", messageDTO);
         chatMessageService.addUser(messageDTO);
@@ -23,7 +24,7 @@ public class MessageController {
     }
 
     @MessageMapping("/chat/message")
-    @SendTo("/sub/chat")
+    @SendTo("/sub/chat/room/{roomId}")
     public ChatMessageDTO message(ChatMessageDTO messageDTO) {
         log.info("Received message - message: {}", messageDTO);
         chatMessageService.sendMessage(messageDTO);
@@ -31,7 +32,7 @@ public class MessageController {
     }
 
     @MessageMapping("/chat/leave")
-    @SendTo("/sub/chat")
+    @SendTo("/sub/chat/room/{roomId}")
     public ChatMessageDTO leave(ChatMessageDTO messageDTO) {
         log.info("Received message - leave: {}", messageDTO);
         chatMessageService.leaveUser(messageDTO);
