@@ -34,6 +34,11 @@ public class ChatRoomService {
         return savedChatRoom.getId();
     }
 
+    public ChatRoom findRoomById(Long roomId) {
+        return chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("채팅방이 존재하지 않습니다."));
+    }
+
     // 특정 채팅방 조회
     public ChatRoomDTO getChatRoom(Long chatRoomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)

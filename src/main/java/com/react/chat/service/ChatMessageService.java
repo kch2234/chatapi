@@ -28,6 +28,7 @@ public class ChatMessageService {
 
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatRoomService chatRoomService;
     private final MemberRepository memberRepository;
 
     private final SimpMessageSendingOperations messagingTemplate;
@@ -51,7 +52,7 @@ public class ChatMessageService {
     // 메시지 저장
     public ChatMessageDTO saveMessage(ChatMessageDTO messageDTO) {
         Optional<Member> findMember = memberRepository.findById(messageDTO.getSender().getId());
-        Optional<ChatRoom> findRoom = chatRoomRepository.findById(messageDTO.getChatRoom().getId());
+        Optional<ChatRoom> findRoom = chatRoomRepository.findById(messageDTO.getRoomId());
         if (findMember.isPresent() && findRoom.isPresent()) {
             Member sender = findMember.get();
             ChatMessage message = modelMapper.map(messageDTO, ChatMessage.class);
@@ -67,41 +68,33 @@ public class ChatMessageService {
 
     // 메시지 전송
     @Transactional
-    public ChatMessageDTO sendMessage(ChatMessageDTO messageDTO) {
-        Optional<Member> findMember = memberRepository.findById(messageDTO.getSender().getId());
-        log.info("findMember: {}", findMember);
-        Optional<ChatRoom> findRoom = chatRoomRepository.findById(messageDTO.getChatRoom().getId());
-        log.info("findRoom: {}", findRoom);
-        if (findMember.isPresent() && findRoom.isPresent()) {
-            Member sender = findMember.get();
-            ChatRoom chatRoom = findRoom.get();
-
-            ChatMessage message = ChatMessageDTO.builder()
-                    .MessageType(MessageType.MESSAGE)
-                    .content(messageDTO.getContent())
-                    .sender(sender)
-                    .ChatRoom(chatRoom)
-                    .timestamp(LocalDateTime.now())
-                    .build().toEntity();
-
-            ChatMessage savedMessage = chatMessageRepository.save(message);
-            log.info("Message saved to DB: {}", savedMessage);
-
-            ChatMessageDTO savedMessageDTO = modelMapper.map(savedMessage, ChatMessageDTO.class);
-            template.convertAndSend("/sub/chat/room/" + messageDTO.getChatRoom().getId(), savedMessageDTO);
-
-            return savedMessageDTO;
-        } else {
-            throw new IllegalArgumentException("존재하지 않는 회원이거나 채팅방입니다.");
+    public void sendMessage(ChatMessageDTO messageDTO) {
+        // sender 정보가 있는지 확인
+        if (messageDTO.getSender() == null || messageDTO.getSender().getId() == null) {
+            throw new IllegalArgumentException("Sender information is missing or invalid");
         }
+
+        // sender 정보를 이용하여 Member 객체를 생성
+        Member sender = memberRepository.findById(messageDTO.getSender().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid sender ID"));
+
+        ChatRoom chatRoom = chatRoomService.findRoomById(messageDTO.getRoomId());
+
+        ChatMessage chatMessage = ChatMessage.builder()
+                .messageType(messageDTO.getMessageType())
+                .content(messageDTO.getContent())
+                .sender(sender)
+                .chatRoom(chatRoom)
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        chatMessageRepository.save(chatMessage);
     }
-
-
 
     @Transactional
     public ChatMessageDTO addUser(ChatMessageDTO messageDTO) {
         Optional<Member> findMember = memberRepository.findById(messageDTO.getSender().getId());
-        Optional<ChatRoom> findRoom = chatRoomRepository.findById(messageDTO.getChatRoom().getId());
+        Optional<ChatRoom> findRoom = chatRoomRepository.findById(messageDTO.getRoomId());
         if (findMember.isPresent() && findRoom.isPresent()) {
             Member sender = findMember.get();
             messageDTO.setContent(sender.getNickname() + "님이 입장하셨습니다.");
@@ -112,7 +105,7 @@ public class ChatMessageService {
             message.setMessageType(MessageType.ENTER);
             chatMessageRepository.save(message);
             ChatMessageDTO savedMessageDTO = modelMapper.map(message, ChatMessageDTO.class);
-            template.convertAndSend("/sub/chat/room/" + messageDTO.getChatRoom().getId(), savedMessageDTO);
+            template.convertAndSend("/sub/chat/room/" + messageDTO.getRoomId(), savedMessageDTO);
             return savedMessageDTO;
         } else {
             throw new IllegalArgumentException("존재하지 않는 회원이거나 채팅방입니다.");
@@ -122,7 +115,7 @@ public class ChatMessageService {
     @Transactional
     public ChatMessageDTO leaveUser(ChatMessageDTO messageDTO) {
         Optional<Member> findMember = memberRepository.findById(messageDTO.getSender().getId());
-        Optional<ChatRoom> findRoom = chatRoomRepository.findById(messageDTO.getChatRoom().getId());
+        Optional<ChatRoom> findRoom = chatRoomRepository.findById(messageDTO.getRoomId());
         if (findMember.isPresent() && findRoom.isPresent()) {
             Member sender = findMember.get();
             messageDTO.setContent(sender.getNickname() + "님이 퇴장하셨습니다.");
@@ -133,7 +126,7 @@ public class ChatMessageService {
             message.setMessageType(MessageType.LEAVE);
             chatMessageRepository.save(message);
             ChatMessageDTO savedMessageDTO = modelMapper.map(message, ChatMessageDTO.class);
-            template.convertAndSend("/sub/chat/room/" + messageDTO.getChatRoom().getId(), savedMessageDTO);
+            template.convertAndSend("/sub/chat/room/" + messageDTO.getRoomId(), savedMessageDTO);
             return savedMessageDTO;
         } else {
             throw new IllegalArgumentException("존재하지 않는 회원이거나 채팅방입니다.");

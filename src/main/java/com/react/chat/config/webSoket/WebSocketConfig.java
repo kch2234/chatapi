@@ -17,16 +17,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final WebSocketChannelInterceptor webSocketChannelInterceptor;
 
     @Override
-    public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/sub"); // 메시지 브로커
-        config.setApplicationDestinationPrefixes("/pub"); // 메시지 발행 경로
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/chat")
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
     }
 
     @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/chat") // WebSocket 엔드포인트
-                .setAllowedOriginPatterns("*")
-                .withSockJS(); // SockJS 사용 설정
+    public void configureMessageBroker(MessageBrokerRegistry registry) {
+        registry.enableSimpleBroker("/sub");
+        registry.setApplicationDestinationPrefixes("/pub");
     }
 
     @Override

@@ -1,8 +1,10 @@
 package com.react.chat.security.filter;
 
 import com.google.gson.Gson;
+import com.react.chat.domain.enumFiles.Gender;
 import com.react.chat.domain.enumFiles.Role;
 import com.react.chat.dto.MemberDTO;
+import com.react.chat.dto.ProfileImageDTO;
 import com.react.chat.util.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -12,21 +14,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
 public class JWTCheckFilter extends OncePerRequestFilter {
-    // 생략 필터 메서드 추가
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+  // 생략 필터 메서드 추가
+  @Override
+  protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
 
-        // Preflight 필터 체크 X (Ajax CORS 요청 전에 날리는것)
-        if (request.getMethod().equals("OPTIONS")) {
-            return true;
-        }
+    // Preflight 필터 체크 X (Ajax CORS 요청 전에 날리는것)
+    if(request.getMethod().equals("OPTIONS")) {
+      return true;
+    }
 
         String requestURI = request.getRequestURI();
         log.info("***** JWTCheckFilter - shouldNotFilter : requestURI : {}", requestURI);
@@ -50,16 +54,16 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 /*    if(requestURI.startsWith("")) {
       return true;
     }*/
-        return false;
-    }
+    return false;
+  }
 
-    // 필터링 로직 작성 (추상메서드)
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("***** JWTCheckFilter - doFilterInternal!");
+// 필터링 로직 작성 (추상메서드)
+@Override
+protected void doFilterInternal( HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    log.info("***** JWTCheckFilter - doFilterInternal!");
 
-        String authValue = request.getHeader("Authorization");
-        log.info("***** doFilterInternal - authValue : {}", authValue);
+    String authValue = request.getHeader("Authorization");
+    log.info("***** doFilterInternal - authValue : {}", authValue);
 
         if (authValue != null && authValue.startsWith("Bearer ")) {
             String token = authValue.substring(7);

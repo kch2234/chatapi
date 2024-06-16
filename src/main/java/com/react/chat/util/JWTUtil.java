@@ -85,6 +85,11 @@ public class JWTUtil {
         return (String) validateToken(token).get("username");
     }
 
+    // 토큰에서 사용자 ID 추출 메서드
+    public static Long getUserIdFromToken(String token) {
+        return Long.parseLong(validateToken(token).get("userId").toString());
+    }
+
     // 토큰 유효성 확인 메서드
     public static boolean isValidToken(String token) {
         try {

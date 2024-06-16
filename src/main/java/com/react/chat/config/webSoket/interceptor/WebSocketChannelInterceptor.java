@@ -7,11 +7,11 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
+import java.util.ArrayList;
 
 @Component
 @Slf4j
@@ -19,7 +19,7 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         log.info("WebSocket Command: {}", accessor.getCommand());
         log.info("Headers: {}", accessor.toNativeHeaderMap());
         log.info("Payload: {}", new String((byte[]) message.getPayload()));
@@ -31,12 +31,12 @@ public class WebSocketChannelInterceptor implements ChannelInterceptor {
             if (authToken != null && authToken.startsWith("Bearer ")) {
                 String token = authToken.substring(7);
                 log.info("WebSocket CONNECT - token: {}", token);
-
+                String username = JWTUtil.getUsernameFromToken(token);
                 try {
                     if (JWTUtil.isValidToken(token)) {
-                        String username = JWTUtil.getUsernameFromToken(token);
                         log.info("WebSocket CONNECT - username: {}", username);
-                        accessor.setUser(new UsernamePasswordAuthenticationToken(username, null, Collections.emptyList()));
+                        Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, new ArrayList<>());
+                        accessor.setUser(authentication);
                     } else {
                         log.error("Invalid JWT token");
                         throw new IllegalArgumentException("Invalid JWT token");

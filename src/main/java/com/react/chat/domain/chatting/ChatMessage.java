@@ -40,10 +40,10 @@ public class ChatMessage extends BaseEntityCreatedDate {
     public ChatMessageDTO toDTO() {
         return ChatMessageDTO.builder()
                 .id(id)
-                .MessageType(messageType)
+                .messageType(messageType)
                 .content(content)
                 .sender(sender)
-                .ChatRoom(chatRoom)
+                .roomId(chatRoom.getId())
                 .timestamp(timestamp)
                 .build();
     }

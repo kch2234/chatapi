@@ -66,7 +66,7 @@ public class WebSoketChatHandler extends TextWebSocketHandler {
         ChatMessageDTO chatMessageDTO = mapper.readValue(payload, ChatMessageDTO.class);
         log.info("session {}", chatMessageDTO.toString());
 
-        Long chatRoomId = chatMessageDTO.getChatRoom().getId();
+        Long chatRoomId = chatMessageDTO.getRoomId();
         // 메모리 상에 채팅방에 대한 세션 없으면 만들어줌
         chatRoomSessionMap.computeIfAbsent(chatRoomId, s -> new HashSet<>()).add(session);
 
