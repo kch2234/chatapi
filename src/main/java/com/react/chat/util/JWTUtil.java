@@ -24,32 +24,26 @@ public class JWTUtil {
         objectMapper.registerModule(new JavaTimeModule());
     }
 
-    // 인코딩된 키
     private static String key = "SGVsbG9Kc29uV2ViVG9rZW5BdXRoZW50aWNhdGlvbldpdGhTcHJpbmdCb290UHJvamVjdFNlY3JldEtleQ";
 
-    // 토큰 생성 메서드 : 사용자나 토큰 정보 + 유효기간 받아 토큰 생성
     public static String generateToken(Map<String, Object> valueMap, int min) {
-        // 암호화된 비밀키
         SecretKey secretKey = null;
         try {
-            // 인코딩된 키를 '암호화된 비밀키'로 변경
             secretKey = Keys.hmacShaKeyFor(JWTUtil.key.getBytes("UTF-8"));
             log.info("secretKey : {}", secretKey);
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e.getMessage());
         }
-        // JWT 토큰 생성 : builder 패턴 사용
         String jwtStr = Jwts.builder()
-                .setHeader(Map.of("typ", "JWT")) // 헤더 정보
-                .setClaims(valueMap) // 페이로드(Claim)에 추가할 (사용자관련)데이터
+                .setHeader(Map.of("typ", "JWT"))
+                .setClaims(valueMap)
                 .setIssuedAt(Date.from(ZonedDateTime.now().toInstant()))
                 .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(min).toInstant()))
-                .serializeToJsonWith(new JacksonSerializer<>(objectMapper)) // JacksonSerializer 사용
-                .signWith(secretKey) // 비밀키로 서명
-                .compact();// 토큰 생성 -> 문자열 리턴
+                .serializeToJsonWith(new JacksonSerializer<>(objectMapper))
+                .signWith(secretKey)
+                .compact();
         log.info("jwtStr : {}", jwtStr);
 
-        // 토큰 리턴
         return jwtStr;
     }
 
