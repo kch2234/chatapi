@@ -3,11 +3,13 @@ package com.react.chat.service;
 import com.react.chat.domain.enumFiles.Role;
 import com.react.chat.domain.enumFiles.UserLanguages;
 import com.react.chat.domain.member.Member;
+import com.react.chat.dto.MemberDTO;
 import com.react.chat.dto.MemberFormDTO;
 import com.react.chat.repository.MemberRepository;
 import com.react.chat.util.FileUtilCustom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,7 +25,7 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
-
+  private final ModelMapper modelMapper;
   private final MemberRepository memberRepository;
   private final FileUtilCustom fileUtil;
   private final PasswordEncoder encoder;
@@ -80,6 +82,14 @@ public class MemberServiceImpl implements MemberService {
     log.info("***** MemberServiceImpl checkNickname - checkNickname : {}", result);
 
     return result;
+  }
+
+  @Override
+  public List<MemberFormDTO> getAllMembers() {
+    List<Member> members = memberRepository.findAll();
+    return members.stream()
+            .map(member -> modelMapper.map(member, MemberFormDTO.class))
+            .collect(Collectors.toList());
   }
 
   // 내부에서만 사용할 메서드 -> private 으로 지정

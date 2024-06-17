@@ -14,7 +14,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
   @Query("select m from Member m where m.email = :email")
   Member getMemberByEmail(@Param("email") String email);
 
-//  Optional<Member> findByEmail(String email);
+  Member findByEmail(String email);
 
   @Query("SELECT CASE WHEN COUNT(m) > 0 THEN TRUE ELSE FALSE END FROM Member m WHERE m.email = :email")
   boolean existsByEmail(@Param("email") String email);

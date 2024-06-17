@@ -1,6 +1,7 @@
 package com.react.chat.controller;
 
 import com.react.chat.domain.member.Member;
+import com.react.chat.dto.MemberDTO;
 import com.react.chat.dto.MemberFormDTO;
 import com.react.chat.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -54,5 +57,13 @@ public class MemberController {
     }
     return res;
   }
+
+  // 회원 목록 조회
+    @GetMapping("/members")
+    public List<MemberFormDTO> getMembers() {
+      List<MemberFormDTO> members = memberService.getAllMembers();
+      log.info("******** MemberController GET /members - members : {}", members);
+      return members;
+    }
 
 }

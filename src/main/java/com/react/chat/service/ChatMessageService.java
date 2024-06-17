@@ -37,10 +37,13 @@ public class ChatMessageService {
 
     // 메시지 목록 조회
     public List<ChatMessageDTO> getMessagesByChatRoomId(Long chatRoomId) {
+        log.info("******** ChatMessageService getMessagesByChatRoomId - chatRoomId : {}", chatRoomId);
         Optional<ChatRoom> getRoomId = chatRoomRepository.findById(chatRoomId);
+        log.info("******** ChatMessageService getMessagesByChatRoomId - getRoomId : {}", getRoomId);
         if (getRoomId.isPresent()) {
             ChatRoom chatRoom = getRoomId.get();
             List<ChatMessage> findMessageList = chatMessageRepository.findByChatRoom(chatRoom);
+            log.info("******** ChatMessageService getMessagesByChatRoomId - findMessageList : {}", findMessageList);
             return findMessageList.stream()
                     .map(message -> modelMapper.map(message, ChatMessageDTO.class))
                     .collect(Collectors.toList());
@@ -70,13 +73,12 @@ public class ChatMessageService {
     @Transactional
     public void sendMessage(ChatMessageDTO messageDTO) {
         // sender 정보가 있는지 확인
-        if (messageDTO.getSender() == null || messageDTO.getSender().getId() == null) {
+        if (messageDTO.getSender() == null || messageDTO.getSender().getEmail() == null) {
             throw new IllegalArgumentException("Sender information is missing or invalid");
         }
 
         // sender 정보를 이용하여 Member 객체를 생성
-        Member sender = memberRepository.findById(messageDTO.getSender().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid sender ID"));
+        Member sender = memberRepository.findByEmail(messageDTO.getSender().getEmail());
 
         ChatRoom chatRoom = chatRoomService.findRoomById(messageDTO.getRoomId());
 

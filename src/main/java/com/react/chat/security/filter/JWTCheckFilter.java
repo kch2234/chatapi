@@ -65,47 +65,47 @@ protected void doFilterInternal( HttpServletRequest request, HttpServletResponse
     String authValue = request.getHeader("Authorization");
     log.info("***** doFilterInternal - authValue : {}", authValue);
 
-        if (authValue != null && authValue.startsWith("Bearer ")) {
-            String token = authValue.substring(7);
-            log.info("JWTCheckFilter - token: {}", token);
-            try {
-                if (JWTUtil.isValidToken(token)) {
-                    String username = JWTUtil.getUsernameFromToken(token);
-                    log.info("***** doFilterInternal - accessToken : {}", token);
-                    String accessToken = authValue.substring(7);
-                    Map<String, Object> claims = JWTUtil.validateToken(accessToken);
-                    log.info("********* doFilterInternal - claims : {}", claims);
+    if (authValue != null && authValue.startsWith("Bearer ")) {
+        String token = authValue.substring(7);
+        log.info("JWTCheckFilter - token: {}", token);
+        try {
+            if (JWTUtil.isValidToken(token)) {
+                String username = JWTUtil.getUsernameFromToken(token);
+                log.info("***** doFilterInternal - accessToken : {}", token);
+                String accessToken = authValue.substring(7);
+                Map<String, Object> claims = JWTUtil.validateToken(accessToken);
+                log.info("********* doFilterInternal - claims : {}", claims);
 
-                    Long id = (Long) claims.get("id");
-                    String email = (String) claims.get("email");
-                    String password = (String) claims.get("password");
-                    Role role = Role.valueOf((String) claims.get("role"));
-                    MemberDTO memberDTO = new MemberDTO(id, email, password, role);
-                    log.info("******** doFilterInternal - memberDTO : {}", memberDTO);
+                Long id = (Long) claims.get("id");
+                String email = (String) claims.get("email");
+                String password = (String) claims.get("password");
+                Role role = Role.valueOf((String) claims.get("role"));
+                MemberDTO memberDTO = new MemberDTO(id, email, password, role);
+                log.info("******** doFilterInternal - memberDTO : {}", memberDTO);
 
-                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO, password, memberDTO.getAuthorities());
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                } else {
-                    log.error("Invalid JWT token");
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    return;
-                }
-            } catch (Exception e) {
-                log.error("***** JWTCheckFilter error!!!");
-                log.error(e.getMessage());
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberDTO, password, memberDTO.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            } else {
+                log.error("Invalid JWT token");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-
-                Gson gson = new Gson();
-                String msg = gson.toJson(Map.of("error", "ERROR_ACCESS_TOKEN"));
-                response.setContentType("application/json");
-                PrintWriter writer = response.getWriter();
-                writer.println(msg);
-                writer.close();
                 return;
             }
-            filterChain.doFilter(request, response);
-        } else {
-            filterChain.doFilter(request, response);
+        } catch (Exception e) {
+            log.error("***** JWTCheckFilter error!!!");
+            log.error(e.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+            Gson gson = new Gson();
+            String msg = gson.toJson(Map.of("error", "ERROR_ACCESS_TOKEN"));
+            response.setContentType("application/json");
+            PrintWriter writer = response.getWriter();
+            writer.println(msg);
+            writer.close();
+            return;
         }
+        filterChain.doFilter(request, response);
+    } else {
+        filterChain.doFilter(request, response);
     }
+}
 }
