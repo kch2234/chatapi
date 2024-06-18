@@ -14,4 +14,7 @@ public interface MemberService {
 
   List<MemberFormDTO> getAllMembers();
   PageResponseDTO<MemberFormDTO> getList(PageRequestDTO pageRequestDTO);
+
+  // 채팅방 생성을 위한 닉네임 조회
+  MemberDTO getMemberId(Long memberId);
 }

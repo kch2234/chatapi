@@ -41,13 +41,13 @@ public class JWTCheckFilter extends OncePerRequestFilter {
         if (requestURI.startsWith("/login")) {
             return true;
         }
-        if (requestURI.startsWith("/api/member")) {
+        if (requestURI.startsWith("/api/member/")) {
             return true;
         }
-        if (requestURI.startsWith("/chat")) {
+        if (requestURI.startsWith("/chat/")) {
             return true;
         }
-        if (requestURI.startsWith("/api/chat")) {
+        if (requestURI.startsWith("/api/chat/")) {
             return true;
         }
         // 추후 이미지 경로로 수정
@@ -59,7 +59,8 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
 // 필터링 로직 작성 (추상메서드)
 @Override
-protected void doFilterInternal( HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+protected void doFilterInternal( HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+        throws ServletException, IOException {
     log.info("***** JWTCheckFilter - doFilterInternal!");
 
     String authValue = request.getHeader("Authorization");

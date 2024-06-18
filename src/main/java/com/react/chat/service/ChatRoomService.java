@@ -32,10 +32,8 @@ public class ChatRoomService {
 
     // 채팅방 생성
     @Transactional
-    public Long createChatRoom(ChatRoomDTO chatRoomDTO) {
-        ChatRoom chatRoom = modelMapper.map(chatRoomDTO, ChatRoom.class);
-        ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
-        return savedChatRoom.getId();
+    public Long createChatRoom(ChatRoomDTO chatRoomDTO, MemberDTO findName) {
+
     }
 
     public ChatRoom findRoomById(Long roomId) {
@@ -43,12 +41,12 @@ public class ChatRoomService {
                 .orElseThrow(() -> new IllegalArgumentException("채팅방이 존재하지 않습니다."));
     }
 
-    // 특정 채팅방 조회
+/*    // 특정 채팅방 조회
     public ChatRoomDTO getChatRoom(Long chatRoomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new IllegalArgumentException("채팅방이 존재하지 않습니다."));
         return modelMapper.map(chatRoom, ChatRoomDTO.class);
-    }
+    }*/
 
     // 사용자가 채팅한 모든 채팅방 조회
     public List<ChatRoomDTO> getChatRoomsByMemberEmail(String email) {

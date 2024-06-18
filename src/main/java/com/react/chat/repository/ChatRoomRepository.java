@@ -15,4 +15,5 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     // 사용자가 속한 채팅방 목록 조회
     @Query("select cr from ChatRoom cr join cr.members m where m.id = :memberId")
     List<ChatRoom> findByMembersEmail(Long memberId);
+
 }

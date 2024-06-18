@@ -12,4 +12,7 @@ import lombok.NoArgsConstructor;
 public class ChatRoomDTO {
     private Long id;
     private String name;
+
+    public void setMemberId(Long memberId) {
+    }
 }

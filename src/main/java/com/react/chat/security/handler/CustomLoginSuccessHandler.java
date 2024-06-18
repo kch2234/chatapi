@@ -22,8 +22,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
-  private final Gson gson;
-
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
@@ -40,6 +38,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     claims.put("accessToken", accessToken);
     claims.put("refreshToken", refreshToken);
 
+    Gson gson = new Gson();
     String jsonStr = gson.toJson(claims);
 
     // 응답 (응답 메세지 보내기)

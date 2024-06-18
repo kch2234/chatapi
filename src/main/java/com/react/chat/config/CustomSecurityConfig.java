@@ -35,8 +35,6 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class CustomSecurityConfig {
 
-  private final Gson gson;
-
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     log.info("***** security config!");
@@ -53,23 +51,23 @@ public class CustomSecurityConfig {
     http.formLogin(login -> {
       login.loginPage("/login"); // 로그인 경로
       // 로그인 성공시 실행될 로직 클래스
-      login.successHandler(new CustomLoginSuccessHandler(gson));
+      login.successHandler(new CustomLoginSuccessHandler());
       // 로그인 실패시 실행될 로직 클래스
       login.failureHandler(new CustomLoginFailureHandler());
     });
 
-    // 권한 설정
-    http.authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/login").permitAll() // 로그인 경로 허용
-            .requestMatchers("/signup").permitAll() // 회원가입 경로 허용
-            .requestMatchers("/chat/**").permitAll() // 웹소켓 엔드포인트 허용
-            .requestMatchers("/api/chat/list").permitAll()
-            .requestMatchers("/api/chat/room").permitAll()
-            .requestMatchers("/api/member/**").permitAll()
-            .requestMatchers("/api/chat/**").permitAll() // 웹소켓 엔드포인트 허용
-            .requestMatchers("/sockjs/**").permitAll()
-            .anyRequest().authenticated()
-    );
+//    // 권한 설정
+//    http.authorizeHttpRequests(authorize -> authorize
+//            .requestMatchers("/login").permitAll() // 로그인 경로 허용
+//            .requestMatchers("/signup").permitAll() // 회원가입 경로 허용
+//            .requestMatchers("/chat/**").permitAll() // 웹소켓 엔드포인트 허용
+//            .requestMatchers("/api/chat/**").permitAll()
+//            .requestMatchers("/api/chat/room").permitAll()
+//            .requestMatchers("/api/member/**").permitAll()
+//            .requestMatchers("/api/chat/**").permitAll() // 웹소켓 엔드포인트 허용
+//            .requestMatchers("/sockjs/**").permitAll()
+//            .anyRequest().authenticated()
+//    );
 
     http.addFilterBefore(new JWTCheckFilter(), UsernamePasswordAuthenticationFilter.class);
 
@@ -90,8 +88,8 @@ public class CustomSecurityConfig {
     configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE"));
     configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
     configuration.setAllowCredentials(true);
-    configuration.setMaxAge(3600L);
-    configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+//    configuration.setMaxAge(3600L);
+//    configuration.setExposedHeaders(Collections.singletonList("Authorization"));
 
     // 위 설정정보를 토대로 Url 전체 경로에 적용하는 CORS 설정 소스 생성해 리턴
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

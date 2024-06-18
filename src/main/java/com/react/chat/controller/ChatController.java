@@ -2,13 +2,14 @@ package com.react.chat.controller;
 
 import com.react.chat.dto.ChatMessageDTO;
 import com.react.chat.dto.ChatRoomDTO;
-import com.react.chat.security.filter.JWTCheckFilter;
+import com.react.chat.dto.MemberDTO;
+import com.react.chat.repository.MemberRepository;
 import com.react.chat.service.ChatMessageService;
 import com.react.chat.service.ChatRoomService;
+import com.react.chat.service.MemberService;
 import com.react.chat.util.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,8 @@ public class ChatController {
 
     private final ChatRoomService chatRoomService;
     private final ChatMessageService chatMessageService;
+    private final MemberService memberService;
+    private final MemberRepository memberRepository;
 
     // 채팅방 id에 속한 메시지 목록 조회
     @GetMapping("/room/{roomId}")
@@ -50,11 +53,18 @@ public class ChatController {
     }
 
     // 채팅방 생성
-    @PostMapping("/room")
-    public Map<String, Long> createChatRoom(@RequestBody ChatRoomDTO chatRoomDTO) {
-        log.info("******** ChatController POST /create - chatRoomDTO : {}", chatRoomDTO);
-        Long room = chatRoomService.createChatRoom(chatRoomDTO);
-        return Map.of("room", room);
+    @PostMapping("/room/{memberId}")
+    public Map<String, Long> createChatRoom(@PathVariable("memberId") Long memberId, @RequestHeader("Authorization") String auth) {
+        if (auth == null || !auth.startsWith("Bearer ")) {
+            log.error("User is not authenticated");
+            throw new IllegalArgumentException("User is not authenticated");
+        }
+
+        Map<String, Object> member = JWTUtil.validateToken(auth.substring(7));
+        log.info("Authenticated user's email: {}", member.get("email"));
+        MemberDTO findName = memberService.getMember(member.get("email").toString());
+        Long roomId = chatRoomService.createChatRoom(chatRoomDTO, findName);
+        return Map.of("roomId", roomId);
     }
 
 

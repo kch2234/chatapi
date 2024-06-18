@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -133,6 +134,12 @@ public class MemberServiceImpl implements MemberService {
         .pageRequestDTO(pageRequestDTO)
         .build();
         }
+
+  @Override
+  public MemberDTO getMemberId(Long memberId) {
+    Optional<Member> findMember = memberRepository.findById(memberId);
+    return modelMapper.map(findMember.orElseThrow(), MemberDTO.class);
+  }
 
     /*Page<Member> result = memberRepository.findAllActiveMembers(pageable);
 
