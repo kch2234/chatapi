@@ -3,14 +3,21 @@ package com.react.chat.controller;
 import com.react.chat.domain.member.Member;
 import com.react.chat.dto.MemberDTO;
 import com.react.chat.dto.MemberFormDTO;
+import com.react.chat.dto.PageRequestDTO;
+import com.react.chat.dto.PageResponseDTO;
 import com.react.chat.service.MemberService;
+import com.react.chat.util.FileUtilCustom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -20,6 +27,12 @@ import java.util.List;
 public class MemberController {
 
   private final MemberService memberService;
+  private final FileUtilCustom fileUtil;
+
+  @GetMapping("/view/{fileName}")
+  public ResponseEntity<Resource> viewFile(@PathVariable("fileName") String fileName) {
+    return fileUtil.getFile(fileName);
+  }
 
   @PostMapping("/checkEmail")
   public ResponseEntity<Boolean> checkEmail(@RequestBody MemberFormDTO memberFormDTO) {
@@ -58,6 +71,11 @@ public class MemberController {
     return res;
   }
 
+  @GetMapping("/list")
+  public PageResponseDTO<MemberFormDTO> getList(PageRequestDTO pageRequestDTO) {
+    log.info("*********** MemberController GET /list - pageRequestDTO : {}", pageRequestDTO);
+    return memberService.getList(pageRequestDTO);
+  }
   // 회원 목록 조회
     @GetMapping("/members")
     public List<MemberFormDTO> getMembers() {

@@ -4,13 +4,23 @@ import com.react.chat.domain.enumFiles.Role;
 import com.react.chat.domain.enumFiles.UserLanguages;
 import com.react.chat.domain.member.Member;
 import com.react.chat.dto.MemberDTO;
+import com.react.chat.domain.member.ProfileImage;
 import com.react.chat.dto.MemberFormDTO;
+import com.react.chat.dto.PageRequestDTO;
+import com.react.chat.dto.PageResponseDTO;
+import com.react.chat.dto.ProfileImageDTO;
 import com.react.chat.repository.MemberRepository;
 import com.react.chat.util.FileUtilCustom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +39,7 @@ public class MemberServiceImpl implements MemberService {
   private final MemberRepository memberRepository;
   private final FileUtilCustom fileUtil;
   private final PasswordEncoder encoder;
+  private static final Logger log = LoggerFactory.getLogger(MemberServiceImpl.class);
 
   @Override
   public Long signup(MemberFormDTO memberFormDTO) {
@@ -91,6 +102,76 @@ public class MemberServiceImpl implements MemberService {
             .map(member -> modelMapper.map(member, MemberFormDTO.class))
             .collect(Collectors.toList());
   }
+
+  @Override
+  public PageResponseDTO<MemberFormDTO> getList(PageRequestDTO pageRequestDTO) {
+    log.info("***** MemberServiceImpl getList - pageRequestDTO : {}", pageRequestDTO);
+
+    Pageable pageable = PageRequest.of(
+        pageRequestDTO.getPage() - 1,
+        pageRequestDTO.getSize(),
+        Sort.by("id").descending());
+
+    Page<Object[]> result = memberRepository.selectList(pageable);
+    List<MemberFormDTO> list = result.getContent().stream().map(objArr -> {
+      Member member = (Member) objArr[0];
+      ProfileImage profileImage = (ProfileImage) objArr[1];
+
+      MemberFormDTO memberFormDTO = entityToDTO(member);
+
+      String imageFileName = profileImage.getFileName();
+      memberFormDTO.setUploadedFileNames(List.of(imageFileName));
+
+      return memberFormDTO;
+    }).collect(Collectors.toList());
+
+    long totalCount = result.getTotalElements();
+
+    return PageResponseDTO.<MemberFormDTO>profileList()
+        .list(list)
+        .totalCount(totalCount)
+        .pageRequestDTO(pageRequestDTO)
+        .build();
+        }
+
+    /*Page<Member> result = memberRepository.findAllActiveMembers(pageable);
+
+    List<MemberFormDTO> list = result.getContent().stream().map(member -> {
+      // ProfileImage 컬렉션에서 ord가 0인 이미지 필터링
+      List<ProfileImage> profileImages = member.getImageList().stream()
+          .filter(image -> image.getOrd() == 0)
+          .collect(Collectors.toList());
+
+      MemberFormDTO memberFormDTO = entityToDTO(member);
+
+      // 대표 이미지 파일명 설정
+      List<String> imageFileNames = profileImages.stream()
+          .map(ProfileImage::getFileName)
+          .collect(Collectors.toList());
+      memberFormDTO.setUploadedFileNames(imageFileNames);
+
+      return memberFormDTO;
+    }).collect(Collectors.toList());
+
+    long totalCount = result.getTotalElements();
+
+    return PageResponseDTO.<MemberFormDTO>profileList()
+        .list(list)
+        .totalCount(totalCount)
+        .pageRequestDTO(pageRequestDTO)
+        .build();
+  }*/
+
+/*  private MemberFormDTO entityToDTO(Member member) {
+    // Member 엔티티를 MemberFormDTO로 변환하는 로직 구현
+    // 예시:
+    return MemberFormDTO.builder()
+        .id(member.getId())
+        .email(member.getEmail())
+        .nickname(member.getNickname())
+        .build();
+  }
+}*/
 
   // 내부에서만 사용할 메서드 -> private 으로 지정
   // Entity -> MemberFormDTO
