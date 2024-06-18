@@ -25,6 +25,13 @@ public class ConversationRequest extends BaseEntityUpdatedDate {
     @JoinColumn(name = "receiverId", nullable = false)
     private Member receiver;
     // 수락, 대기, 거절 여부
-//    @Builder.Default
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
     private ChattingStatus status = ChattingStatus.WAIT;
+
+    // 필드 수정 메서드
+    // status
+    public void updateStatus(ChattingStatus status) {
+        this.status = status;
+    }
 }

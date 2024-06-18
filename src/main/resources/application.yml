@@ -22,11 +22,13 @@ logging:
   level:
     org.hibernate.sql: debug
     org.hibernate.orm.jdbc.bind: trace
+    org.springframework.security.web: trace
 
 server:
+  port: 8080
   servlet:
     session:
       tracking-modes: cookie
 
 # 파일 업로드 경로
-chat.upload.path: upload
+chatapi.upload.path: upload

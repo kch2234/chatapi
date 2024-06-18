@@ -1,26 +1,27 @@
 package com.react.chat.domain.member;
 
-import com.react.chat.domain.baseEntity.BaseEntityCreatedDate;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
+//@Entity
+@Embeddable
 @Getter
 @ToString
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProfileImage extends BaseEntityCreatedDate {
-    @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
-    private Long id;
+public class ProfileImage {
+    //@Id
+    //@GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
+    //private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
-
+    //@ManyToOne
+    //@JoinColumn(name = "member_id", nullable = false)
+    //private Member member;
     private String fileName;
-    @Setter // 편의를 위해 ord만 setter 걸어주기
     private int ord;  // 이미지마다 번호 지정, 대표이미지 = 0 인것
 
+    public void setOrd(int size) {
+
+    }
 }
