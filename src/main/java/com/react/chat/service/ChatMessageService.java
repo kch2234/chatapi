@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -61,7 +62,7 @@ public class ChatMessageService {
             ChatMessage message = modelMapper.map(messageDTO, ChatMessage.class);
             message.setSender(sender);
             message.setChatRoom(findRoom.get());
-            message.setTimestamp(LocalDateTime.now());
+            message.setTimestamp(LocalTime.now());
             ChatMessage savedMessage = chatMessageRepository.save(message);
             return modelMapper.map(savedMessage, ChatMessageDTO.class);
         } else {
@@ -87,7 +88,7 @@ public class ChatMessageService {
                 .content(messageDTO.getContent())
                 .sender(sender)
                 .chatRoom(chatRoom)
-                .timestamp(LocalDateTime.now())
+                .timestamp(LocalTime.now())
                 .build();
 
         chatMessageRepository.save(chatMessage);
@@ -103,7 +104,7 @@ public class ChatMessageService {
             ChatMessage message = modelMapper.map(messageDTO, ChatMessage.class);
             message.setSender(sender);
             message.setChatRoom(findRoom.get());
-            message.setTimestamp(LocalDateTime.now());
+            message.setTimestamp(LocalTime.now());
             message.setMessageType(MessageType.ENTER);
             chatMessageRepository.save(message);
             ChatMessageDTO savedMessageDTO = modelMapper.map(message, ChatMessageDTO.class);
@@ -124,7 +125,7 @@ public class ChatMessageService {
             ChatMessage message = modelMapper.map(messageDTO, ChatMessage.class);
             message.setSender(sender);
             message.setChatRoom(findRoom.get());
-            message.setTimestamp(LocalDateTime.now());
+            message.setTimestamp(LocalTime.now());
             message.setMessageType(MessageType.LEAVE);
             chatMessageRepository.save(message);
             ChatMessageDTO savedMessageDTO = modelMapper.map(message, ChatMessageDTO.class);

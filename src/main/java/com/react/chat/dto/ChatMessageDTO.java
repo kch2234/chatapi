@@ -8,6 +8,7 @@ import com.react.chat.domain.member.Member;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Data
 @Builder
@@ -17,9 +18,10 @@ public class ChatMessageDTO {
     private Long id;
     private MessageType messageType;
     private String content;
-    private Member sender; // 수정된 부분
+    private Member sender;
+//    private String nickname;
     private Long roomId;
-    private LocalDateTime timestamp;
+    private LocalTime timestamp = LocalTime.now();
 
     @JsonProperty("type")
     public void setMessageType(MessageType messageType) {
@@ -32,6 +34,7 @@ public class ChatMessageDTO {
                 .messageType(messageType)
                 .content(content)
                 .sender(sender)
+//                .sender(Member.builder().nickname(nickname).build())
                 .chatRoom(chatRoom)
                 .timestamp(timestamp)
                 .build();

@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Getter
@@ -35,7 +36,7 @@ public class ChatMessage extends BaseEntityCreatedDate {
     private ChatRoom chatRoom;
 
     @Column(nullable = false)
-    private LocalDateTime timestamp;
+    private LocalTime timestamp = LocalTime.now();
 
     public ChatMessageDTO toDTO() {
         return ChatMessageDTO.builder()

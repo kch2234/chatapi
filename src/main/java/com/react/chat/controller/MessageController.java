@@ -21,14 +21,6 @@ public class MessageController {
     private final ChatMessageService chatMessageService;
     private final ChatRoomService chatRoomService;
 
-    @MessageMapping("/chat/info/{token}")
-    @SendTo("/sub/chat/room/{roomId}")
-    public ChatMessageDTO enter(ChatMessageDTO messageDTO) {
-        log.info("Received message - enter: {}", messageDTO);
-        chatMessageService.addUser(messageDTO);
-        return messageDTO;
-    }
-
     @MessageMapping("/chat/room/{roomId}/message")
     @SendTo("/sub/chat/room/{roomId}")
     public ChatMessageDTO sendMessage(@DestinationVariable Long roomId, ChatMessageDTO messageDTO) {
@@ -37,6 +29,20 @@ public class MessageController {
         ChatRoom chatRoom = chatRoomService.findRoomById(roomId);
         ChatMessage chatMessage = messageDTO.toEntity(chatRoom); // ChatRoom 객체를 엔티티로 변환
         chatMessageService.sendMessage(chatMessage.toDTO());
+        return messageDTO;
+    }
+
+
+
+
+
+
+
+    @MessageMapping("/chat/info/{token}")
+    @SendTo("/sub/chat/room/{roomId}")
+    public ChatMessageDTO enter(ChatMessageDTO messageDTO) {
+        log.info("Received message - enter: {}", messageDTO);
+        chatMessageService.addUser(messageDTO);
         return messageDTO;
     }
 

@@ -76,6 +76,7 @@ public class MemberController {
     log.info("*********** MemberController GET /list - pageRequestDTO : {}", pageRequestDTO);
     return memberService.getList(pageRequestDTO);
   }
+
   // 회원 목록 조회
     @GetMapping("/members")
     public List<MemberFormDTO> getMembers() {

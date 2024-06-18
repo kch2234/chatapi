@@ -61,8 +61,10 @@ public class CustomSecurityConfig {
     // 권한 설정
     http.authorizeHttpRequests(authorize -> authorize
             .requestMatchers("/login").permitAll() // 로그인 경로 허용
+            .requestMatchers("/signup").permitAll() // 회원가입 경로 허용
             .requestMatchers("/chat/**").permitAll() // 웹소켓 엔드포인트 허용
             .requestMatchers("/api/chat/list").permitAll()
+            .requestMatchers("/api/chat/room").permitAll()
             .requestMatchers("/api/member/**").permitAll()
             .requestMatchers("/api/chat/**").permitAll() // 웹소켓 엔드포인트 허용
             .requestMatchers("/sockjs/**").permitAll()

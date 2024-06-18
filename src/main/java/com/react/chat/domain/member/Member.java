@@ -40,7 +40,7 @@ public class Member extends BaseEntityUpdatedDate {
     @Column(nullable = false, length = 500)
     private String password; // 비밀번호
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     //@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProfileImage> imageList = new ArrayList<>();//프로필 이미지
@@ -76,9 +76,9 @@ public class Member extends BaseEntityUpdatedDate {
     private boolean disabled = false; // 탈퇴 여부 기본값 false : 탈퇴시 true
     private LocalDateTime disabledDate; // 탈퇴 날짜 : 30일 후 DB 삭제
 
-    @ManyToMany(mappedBy = "members")
-    @Builder.Default
-    private List<ChatRoom> chatRooms = new ArrayList<>(); // 채팅방
+//    @ManyToMany(mappedBy = "members")
+//    @Builder.Default
+//    private List<ChatRoom> chatRooms = new ArrayList<>(); // 채팅방
 
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
