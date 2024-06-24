@@ -32,8 +32,14 @@ public class ChatRoomService {
 
     // 채팅방 생성
     @Transactional
-    public Long createChatRoom(ChatRoomDTO chatRoomDTO, MemberDTO findName) {
-
+    public ChatRoomDTO createChatRoom(String email) {
+        log.info("******** ChatRoomService getChatRoomsByMemberEmail - email : {}", email);
+        Long findMember = memberRepository.findByEmail(email).getId();
+        log.info("******** ChatRoomService getChatRoomsByMemberEmail - findMember : {}", findMember);
+        chatRoomRepository.save(ChatRoom.builder()
+                .name(findMember.toString())
+                .build());
+        return ChatRoomDTO.builder();
     }
 
     public ChatRoom findRoomById(Long roomId) {

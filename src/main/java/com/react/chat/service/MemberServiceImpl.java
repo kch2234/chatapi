@@ -135,12 +135,6 @@ public class MemberServiceImpl implements MemberService {
         .build();
         }
 
-  @Override
-  public MemberDTO getMemberId(Long memberId) {
-    Optional<Member> findMember = memberRepository.findById(memberId);
-    return modelMapper.map(findMember.orElseThrow(), MemberDTO.class);
-  }
-
     /*Page<Member> result = memberRepository.findAllActiveMembers(pageable);
 
     List<MemberFormDTO> list = result.getContent().stream().map(member -> {
