@@ -59,6 +59,8 @@ public class ChatController {
             log.error("User is not authenticated");
             throw new IllegalArgumentException("User is not authenticated");
         }
+        // TODO: DB에서 조회 후 없으면 생성,
+        // TODO: 이미 존재한다면 해당 채팅방 정보 리턴
         Map<String, Object> member = JWTUtil.validateToken(auth.substring(7));
         log.info("Authenticated user's email: {}", member.get("email"));
         Long findMemberId = memberService.getMemberId(memberId);
