@@ -53,15 +53,18 @@ public class ChatController {
     }
 
     // 채팅방 생성
-    @PostMapping("/room")
-    public ChatRoomDTO createChatRoom(@RequestHeader("Authorization") String auth) {
+    @PostMapping("/room/{memberId}")
+    public ChatRoomDTO createChatRoom(@RequestHeader("Authorization") String auth, @PathVariable("memberId") Long memberId) {
         if (auth == null || !auth.startsWith("Bearer ")) {
             log.error("User is not authenticated");
             throw new IllegalArgumentException("User is not authenticated");
         }
         Map<String, Object> member = JWTUtil.validateToken(auth.substring(7));
         log.info("Authenticated user's email: {}", member.get("email"));
-        chatRoomService.createChatRoom(member.get("email").toString());
+        Long findMemberId = memberService.getMemberId(memberId);
+        ChatRoomDTO chatRoomDTO = chatRoomService.createChatRoom(member.get("email").toString(), findMemberId);
+        log.info("******** ChatController POST /room/:memberId - chatRoom : {}", chatRoomDTO);
+        return chatRoomDTO;
     }
 
 

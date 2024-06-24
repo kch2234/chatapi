@@ -135,6 +135,11 @@ public class MemberServiceImpl implements MemberService {
         .build();
         }
 
+  @Override
+  public Long getMemberId(Long id) {
+    return memberRepository.findById(id).get().getId();
+  }
+
     /*Page<Member> result = memberRepository.findAllActiveMembers(pageable);
 
     List<MemberFormDTO> list = result.getContent().stream().map(member -> {

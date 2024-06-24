@@ -32,14 +32,28 @@ public class ChatRoomService {
 
     // 채팅방 생성
     @Transactional
-    public ChatRoomDTO createChatRoom(String email) {
-        log.info("******** ChatRoomService getChatRoomsByMemberEmail - email : {}", email);
-        Long findMember = memberRepository.findByEmail(email).getId();
-        log.info("******** ChatRoomService getChatRoomsByMemberEmail - findMember : {}", findMember);
-        chatRoomRepository.save(ChatRoom.builder()
-                .name(findMember.toString())
-                .build());
-        return ChatRoomDTO.builder();
+    public ChatRoomDTO createChatRoom(String email, Long memberId) {
+        // 이메일로 로그인한 회원 조회
+        Member loginMember = memberRepository.findByEmail(email);
+
+        // memberId로 회원 조회
+        Member sender = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("ID가 " + memberId + "인 회원을 찾을 수 없습니다"));
+
+        // 새로운 채팅방 생성
+        ChatRoom chatRoom = ChatRoom.builder()
+                .name(sender.getNickname()) // 다른 회원의 닉네임을 이름으로 설정
+                .build();
+
+        // 두 회원을 채팅방에 추가
+        chatRoom.getMembers().add(loginMember);
+        chatRoom.getMembers().add(sender);
+
+        // 데이터베이스에 채팅방 저장
+        chatRoomRepository.save(chatRoom);
+
+        // DTO로 변환하여 반환
+        return new ChatRoomDTO(chatRoom.getId(), chatRoom.getName());
     }
 
     public ChatRoom findRoomById(Long roomId) {

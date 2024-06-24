@@ -14,4 +14,6 @@ public interface MemberService {
 
   List<MemberFormDTO> getAllMembers();
   PageResponseDTO<MemberFormDTO> getList(PageRequestDTO pageRequestDTO);
+
+  Long getMemberId(Long id);
 }
