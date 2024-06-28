@@ -37,12 +37,16 @@ public class ChatRoomService {
         Member loginMember = memberRepository.findByEmail(email);
 
         // memberId로 회원 조회
-        Member sender = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("ID가 " + memberId + "인 회원을 찾을 수 없습니다"));
+        Member sender = memberRepository.findById(memberId).orElse(null);
+
+        // 만약 로그인한 회원과 memberId로 조회한 회원이 같다면 채팅방 생성 불가
+        if(loginMember.getId().equals(sender.getId())) {
+            throw new IllegalArgumentException("자신과 채팅방을 생성할 수 없습니다.");
+        }
 
         // 새로운 채팅방 생성
         ChatRoom chatRoom = ChatRoom.builder()
-                .name(sender.getNickname()) // 다른 회원의 닉네임을 이름으로 설정
+                .name(sender.getNickname()) // 다른 회원의 닉네임을 채팅방 이름으로 설정 (기본값) 추후 채팅방 이름 수정 가능
                 .build();
 
         // 두 회원을 채팅방에 추가
